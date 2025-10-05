@@ -4,4 +4,4 @@ export const pages = {
     login: '/sign-in',
     resetPassword: '/resetPassword',
     player: '/player' 
-}
+} 
