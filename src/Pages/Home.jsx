@@ -30,6 +30,19 @@ const Home = () => {
 
   }, [genresLoaded])
 
+  const dataMovies = genres.map((genre) => {
+    return {
+      ...genre,
+      movies: movies
+        .filter((movie, index, self) => 
+          movie.genre_ids.includes(genre.id) &&
+          self.findIndex(m => m.id === movie.id) === index
+        )
+    }
+  })
+
+  console.log(dataMovies)
+
   return (
     <>
       <Stack 
@@ -58,7 +71,7 @@ const Home = () => {
           </Stack>
         </Stack>
       </Stack>
-      <Slider movies={movies} genres={genres}/>
+      <Slider movies={dataMovies} genres={genres}/>
     </>
   )
 }

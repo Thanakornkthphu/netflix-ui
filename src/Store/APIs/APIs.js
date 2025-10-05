@@ -32,21 +32,42 @@ const createArrayFromRawData = (responseArray, moviesArray, genres) => {
     })
   }
 
-const getRawData = async(type, genres, paging) => {
+const getRawData = async (type, genres, paging) => {
     const moviesArray = []
+    let page = 1 
 
-    for (let i = 0; moviesArray.length < 60 && i < 10; i++) {
-        const page = paging ? `&page=${paging}` : ''
-        const url = `${TMDB_BASE_URL}/trending/${type}/week?api_key=${API_KEY}${page}`
+    while (moviesArray.length < 100 && page <= 5) {
+        const url = `${TMDB_BASE_URL}/trending/${type}/week?api_key=${API_KEY}&page=${page}`
 
-        const response = await axios.get(url)
+        try {
+            const response = await axios.get(url)
+            createArrayFromRawData(response.data.results, moviesArray, genres)
+        } catch (error) {
+            console.error(`Error fetching page ${page}:`, error)
+            break  
+        }
 
-        createArrayFromRawData(response.data.results, moviesArray, genres)
+        page++ 
     }
 
     return moviesArray
-
 }
+
+// const getRawData = async(type, genres, paging) => {
+//     const moviesArray = []
+
+//     for (let i = 0; moviesArray.length < 100 && i < 10; i++) {
+//         const page = paging ? `&page=${paging}` : ''
+//         const url = `${TMDB_BASE_URL}/trending/${type}/week?api_key=${API_KEY}${page}`
+
+//         const response = await axios.get(url)
+
+//         createArrayFromRawData(response.data.results, moviesArray, genres)
+//     }
+
+//     return moviesArray
+
+// }
 
 const moviesAPI = { genreMovies, getRawData }
 
