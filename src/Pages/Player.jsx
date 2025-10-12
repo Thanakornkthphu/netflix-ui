@@ -9,7 +9,7 @@ const Player = () => {
   return (
     <Container>
         <FaAngleLeft style={{ fontSize: '40px', color: 'white', cursor: 'pointer', position: 'absolute', top: '20px', left: '20px', zIndex: 1 }} onClick={() => navigate(-1)}/>
-        <video  src={videoTrailer} autoPlay loop controls muted/>
+        <Video  src={videoTrailer} autoPlay loop controls muted/>
     </Container>
   )
 }
@@ -17,5 +17,14 @@ const Player = () => {
 const Container = styled(Stack)`
   width: 100vw;
   height: 100vh;
+  overflow: hidden; 
+  position: relative; 
 `
+
+const Video = styled('video')`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+`
+
 export default Player

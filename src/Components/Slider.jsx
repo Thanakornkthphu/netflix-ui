@@ -82,6 +82,7 @@ const Slider = ({ movies }) => {
                 }}
                 modules={[Navigation]}
                 spaceBetween={20}
+                slidesPerGroup={6}
                 navigation={{
                   prevEl: `#${prevId}`,
                   nextEl: `#${nextId}`,
