@@ -52,6 +52,7 @@ const Home = () => {
           backgroundImage: `linear-gradient(#00000069, #00000069), url(${backgroundImg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'bottom',
+          overflowX: 'hidden',
         }}
       >
         <Stack sx={{ padding: '30px 60px'}}>
@@ -71,7 +72,9 @@ const Home = () => {
           </Stack>
         </Stack>
       </Stack>
-      <Slider movies={dataMovies} genres={genres}/>
+      <Stack sx={{ paddingBottom: '100px' }}>
+        <Slider movies={dataMovies} genres={genres}/>
+      </Stack>
     </>
   )
 }
