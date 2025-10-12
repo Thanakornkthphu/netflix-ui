@@ -21,10 +21,6 @@ const createArrayFromRawData = (responseArray, moviesArray, genres) => {
             moviesArray.push(
                 {
                     ...movie
-                    // id: movie.id,
-                    // name: movie?.original_name ? movie.original_name : movie.original_title,
-                    // image: movie.backdrop_path,
-                    // genres: movieGenres.slice(0, 3),
                 }
             )
         }
@@ -52,22 +48,6 @@ const getRawData = async (type, genres, paging) => {
 
     return moviesArray
 }
-
-// const getRawData = async(type, genres, paging) => {
-//     const moviesArray = []
-
-//     for (let i = 0; moviesArray.length < 100 && i < 10; i++) {
-//         const page = paging ? `&page=${paging}` : ''
-//         const url = `${TMDB_BASE_URL}/trending/${type}/week?api_key=${API_KEY}${page}`
-
-//         const response = await axios.get(url)
-
-//         createArrayFromRawData(response.data.results, moviesArray, genres)
-//     }
-
-//     return moviesArray
-
-// }
 
 const moviesAPI = { genreMovies, getRawData }
 

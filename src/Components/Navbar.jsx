@@ -42,7 +42,7 @@ const Navbar = () => {
                 ))}
             </Stack>
             <Stack>
-                <FaPowerOff onClick={onSubmitSignOut}/>
+                <FaPowerOff onClick={onSubmitSignOut} style={{ cursor: 'pointer' }}/>
             </Stack>
         </Stack>
     )

@@ -40,7 +40,7 @@ const Slider = ({ movies }) => {
         return (
           <Stack key={index} sx={{ padding: "0px 20px" }}>
             <Typography
-              mt="80px"
+              mt="40px"
               mb="5px"
               ml="20px"
               sx={{ color: "white", fontSize: "32px", fontWeight: "bold" }}
@@ -92,6 +92,7 @@ const Slider = ({ movies }) => {
                 style={{
                   width: "100%",
                   padding: "10px 0",
+                  overflow: "visible",
                 }}
               >
                 {movie.movies.map((m, i) => (
@@ -99,6 +100,7 @@ const Slider = ({ movies }) => {
                     <CardTrailer
                       movie={m}
                       randomShowLogo={m.vote_average > 7}
+                      index={i}
                     />
                   </SwiperSlide>
                 ))}

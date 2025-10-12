@@ -9,7 +9,10 @@ const Player = () => {
   return (
     <Container>
         <FaAngleLeft style={{ fontSize: '40px', color: 'white', cursor: 'pointer', position: 'absolute', top: '20px', left: '20px', zIndex: 1 }} onClick={() => navigate(-1)}/>
-        <Video  src={videoTrailer} autoPlay loop controls muted/>
+        <Iframe
+          src="https://www.youtube.com/embed/sBEvEcpnG7k?autoplay=1&mute=0&loop=1&controls=1&playlist=sBEvEcpnG7k"
+          allow="autoplay; fullscreen"
+        />
     </Container>
   )
 }
@@ -21,10 +24,11 @@ const Container = styled(Stack)`
   position: relative; 
 `
 
-const Video = styled('video')`
+const Iframe = styled("iframe")`
   width: 100%;
   height: 100%;
-  object-fit: cover; 
+  border: none;
+  object-fit: cover;
 `
 
 export default Player
