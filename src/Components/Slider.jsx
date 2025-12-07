@@ -52,7 +52,10 @@ const Slider = ({ movies }) => {
             <Stack
               direction="row"
               alignItems="center"
-              sx={{ position: "relative" }}
+              sx={{ 
+                position: "relative",
+                zIndex: hoveredIndex === index ? 100 : 1,
+              }}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
@@ -78,8 +81,8 @@ const Slider = ({ movies }) => {
               <Swiper
                 breakpoints={{
                   0: { slidesPerView: 2 },
-                  600: { slidesPerView: 9.3 },
-                  1200: { slidesPerView: 9.3 },
+                  600: { slidesPerView: 4 },
+                  1200: { slidesPerView: 7 },
                 }}
                 modules={[Navigation]}
                 spaceBetween={20}

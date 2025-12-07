@@ -8,6 +8,7 @@ const ModalCardTrailer = ({ open, onClose }) => {
           onClose={onClose}
           aria-labelledby="modal-card-trailer-title"
           sx={{
+            zIndex: 1000,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
