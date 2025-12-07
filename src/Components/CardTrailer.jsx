@@ -7,9 +7,12 @@ import MiniPlayer from "./MiniPlayer"
 const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
   const [isHoverCardTrailer, setIsHoverCardTrailer] = useState(false)
   const [openModal, setOpenModal] = useState(false)
+
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
   const hoverTimerRef = useRef(null)
   const isMountedRef = useRef(true)
   const movieIdRef = useRef(movie.id)
+  
 
   useEffect(() => {
     const previousMovieId = movieIdRef.current
@@ -83,7 +86,7 @@ const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          {randomShowLogo && (
+          {randomShowLogo && isImageLoaded && (
             <NetflixLogo
               style={{
                 position: "absolute",
@@ -99,6 +102,7 @@ const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
             src={"https://image.tmdb.org/t/p/w500" + movie.poster_path}
             alt={movie.title}
             style={{ borderRadius: "7px", maxWidth: "500px" }}
+            onLoad={() => setIsImageLoaded(true)}
           />
         </Stack>
       )}

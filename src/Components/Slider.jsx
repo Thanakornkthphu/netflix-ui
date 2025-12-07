@@ -7,8 +7,9 @@ import "swiper/css"
 import "swiper/css/navigation"
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
+import SliderSkeleton from "./SliderSkeleton"
 
-const Slider = ({ movies }) => {
+const Slider = ({ movies, isLoading }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null)
   const [hoveredMovieId, setHoveredMovieId] = useState(null)
 
@@ -22,6 +23,10 @@ const Slider = ({ movies }) => {
         isAtEnd: swiper.isEnd,
       },
     }))
+  }
+
+  if (isLoading) {
+    return <SliderSkeleton />
   }
 
   return (
@@ -97,7 +102,7 @@ const Slider = ({ movies }) => {
                   overflow: "visible",
                 }}
               >
-                {movie.movies.map((m, i) => (
+                {movie && movie.movies.map((m, i) => (
                   <SwiperSlide
                     key={m.id || i}
                     style={{

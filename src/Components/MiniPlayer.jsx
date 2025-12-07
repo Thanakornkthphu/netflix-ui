@@ -14,6 +14,14 @@ import { FaPlay } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
 import { pages } from "../Routers/path"
 
+const getLastCardOfScreen = () => {
+  if (typeof window === "undefined") return 6
+  const width = window.innerWidth
+  if (width >= 1200) return 6
+  if (width >= 600) return 3
+  return 1
+}
+
 const MiniPlayer = ({
   isHoverCardTrailer,
   setIsHoverCardTrailer,
@@ -22,26 +30,18 @@ const MiniPlayer = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [showMoreInfo, setShowMoreInfo] = useState(false)
-  const [lastCardOfScreen, setLastCardOfScreen] = useState(1)
+  const [lastCardOfScreen, setLastCardOfScreen] = useState(getLastCardOfScreen)
 
   const genres = getGenresFromIds(movie.genre_ids)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const calculateLastCard = () => {
-      const width = window.innerWidth
-      if (width >= 1200) {
-        setLastCardOfScreen(6)
-      } else if (width >= 600) {
-        setLastCardOfScreen(3)
-      } else {
-        setLastCardOfScreen(1)
-      }
+    const handleResize = () => {
+      setLastCardOfScreen(getLastCardOfScreen())
     }
 
-    calculateLastCard()
-    window.addEventListener("resize", calculateLastCard)
-    return () => window.removeEventListener("resize", calculateLastCard)
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
   }, [])
 
   useEffect(() => {
@@ -65,8 +65,6 @@ const MiniPlayer = ({
     }
   }
 
-  console.log("movie", movie)
-
   return (
     <Card
       sx={{
@@ -78,11 +76,6 @@ const MiniPlayer = ({
         height: "auto",
         borderRadius: "8px",
         overflow: "hidden",
-        // transform: isHoverCardTrailer
-        //   ? isVisible
-        //     ? "scale(1.1)"
-        //     : "scale(0.85)"
-        //   : "scale(0.85)",
         transform: isVisible ? "scale(1.1)" : "scale(0.85)",
         opacity: isHoverCardTrailer ? 1 : 0,
         transition:
@@ -119,7 +112,7 @@ const MiniPlayer = ({
         >
           <Button
             onClick={() => {
-              navigate(`${pages.player.replace(':id', movie.id)}`)
+              navigate(`${pages.player.replace(":id", movie.id)}`)
             }}
             sx={{
               backgroundColor: "rgba(255, 255, 255, 0.1)",
