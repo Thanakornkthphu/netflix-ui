@@ -1,5 +1,5 @@
 import { Card, CardContent, Stack, styled, Typography } from "@mui/material"
-import React, { useRef, useState } from "react"
+import React, { useRef, useState, useEffect, useCallback } from "react"
 import { ReactComponent as NetflixLogo } from "../Assets/netflixIcon.svg"
 import ModalCardTrailer from "./ModalCardTrailer"
 import MiniPlayer from "./MiniPlayer"
@@ -8,19 +8,59 @@ const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
   const [isHoverCardTrailer, setIsHoverCardTrailer] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const hoverTimerRef = useRef(null)
+  const isMountedRef = useRef(true)
+  const movieIdRef = useRef(movie.id)
 
-  const handleMouseEnter = () => {
+  useEffect(() => {
+    const previousMovieId = movieIdRef.current
+    movieIdRef.current = movie.id
+
+    if (previousMovieId !== movie.id) {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current)
+        hoverTimerRef.current = null
+      }
+      if (isHoverCardTrailer) {
+        setIsHoverCardTrailer(false)
+        onHoverChange?.(false)
+      }
+    }
+  }, [movie.id, isHoverCardTrailer, onHoverChange])
+
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current)
+        hoverTimerRef.current = null
+      }
+    }
+  }, [])
+
+  const handleMouseEnter = useCallback(() => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current)
+      hoverTimerRef.current = null
+    }
+
+    const currentMovieId = movieIdRef.current
     hoverTimerRef.current = setTimeout(() => {
-      setIsHoverCardTrailer(true)
-      onHoverChange?.(true)
-    }, 500)
-  }
+      if (isMountedRef.current && movieIdRef.current === currentMovieId) {
+        setIsHoverCardTrailer(true)
+        onHoverChange?.(true)
+      }
+    }, 700)
+  }, [onHoverChange])
 
-  const handleMouseLeave = () => {
-    clearTimeout(hoverTimerRef.current)
+  const handleMouseLeave = useCallback(() => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current)
+      hoverTimerRef.current = null
+    }
     setIsHoverCardTrailer(false)
     onHoverChange?.(false)
-  }
+  }, [onHoverChange])
 
   return (
     <>

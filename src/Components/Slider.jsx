@@ -10,7 +10,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 
 const Slider = ({ movies }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null)
-  const [hoveredCardIndex, setHoveredCardIndex] = useState(null)
+  const [hoveredMovieId, setHoveredMovieId] = useState(null)
 
   const [sliderStates, setSliderStates] = useState({})
 
@@ -52,14 +52,13 @@ const Slider = ({ movies }) => {
             <Stack
               direction="row"
               alignItems="center"
-              sx={{ 
+              sx={{
                 position: "relative",
                 zIndex: hoveredIndex === index ? 100 : 1,
               }}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              {/* ลูกศรซ้าย */}
               <IconButton
                 id={prevId}
                 sx={{
@@ -77,7 +76,6 @@ const Slider = ({ movies }) => {
                 <ArrowBackIosNewIcon />
               </IconButton>
 
-              {/* Swiper */}
               <Swiper
                 breakpoints={{
                   0: { slidesPerView: 2 },
@@ -101,9 +99,9 @@ const Slider = ({ movies }) => {
               >
                 {movie.movies.map((m, i) => (
                   <SwiperSlide
-                    key={i}
+                    key={m.id || i}
                     style={{
-                      zIndex: hoveredCardIndex === i ? 100 : 1,
+                      zIndex: hoveredMovieId === m.id ? 100 : 1,
                       overflow: "visible",
                     }}
                   >
@@ -111,15 +109,29 @@ const Slider = ({ movies }) => {
                       movie={m}
                       randomShowLogo={m.vote_average > 7}
                       index={i}
-                      onHoverChange={(isHovered) =>
-                        setHoveredCardIndex(isHovered ? i : null)
-                      }
+                      totalCards={movie.movies.length}
+                      onHoverChange={(isHovered) => {
+                        if (isHovered) {
+                          // Immediately reset previous hovered card when hovering new card
+                          if (
+                            hoveredMovieId !== null &&
+                            hoveredMovieId !== m.id
+                          ) {
+                            setHoveredMovieId(null)
+                          }
+                          setHoveredMovieId(m.id)
+                        } else {
+                          // Only reset if this is the currently hovered card
+                          if (hoveredMovieId === m.id) {
+                            setHoveredMovieId(null)
+                          }
+                        }
+                      }}
                     />
                   </SwiperSlide>
                 ))}
               </Swiper>
 
-              {/* ลูกศรขวา */}
               <IconButton
                 id={nextId}
                 sx={{
