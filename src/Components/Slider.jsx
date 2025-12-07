@@ -1,25 +1,26 @@
-import React, { useState } from 'react'
-import CardTrailer from './CardTrailer'
-import { Stack, Typography, IconButton } from '@mui/material'
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import React, { useState } from "react"
+import CardTrailer from "./CardTrailer"
+import { Stack, Typography, IconButton } from "@mui/material"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Navigation } from "swiper/modules"
+import "swiper/css"
+import "swiper/css/navigation"
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew"
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 
 const Slider = ({ movies }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null)
+  const [hoveredCardIndex, setHoveredCardIndex] = useState(null)
 
   const [sliderStates, setSliderStates] = useState({})
 
   const handleUpdateState = (index, swiper) => {
-    setSliderStates(prev => ({
+    setSliderStates((prev) => ({
       ...prev,
       [index]: {
         isAtBeginning: swiper.isBeginning,
-        isAtEnd: swiper.isEnd
-      }
+        isAtEnd: swiper.isEnd,
+      },
     }))
   }
 
@@ -77,7 +78,7 @@ const Slider = ({ movies }) => {
               <Swiper
                 breakpoints={{
                   0: { slidesPerView: 2 },
-                  600: { slidesPerView: 4 },
+                  600: { slidesPerView: 9.3 },
                   1200: { slidesPerView: 9.3 },
                 }}
                 modules={[Navigation]}
@@ -96,11 +97,20 @@ const Slider = ({ movies }) => {
                 }}
               >
                 {movie.movies.map((m, i) => (
-                  <SwiperSlide key={i}>
+                  <SwiperSlide
+                    key={i}
+                    style={{
+                      zIndex: hoveredCardIndex === i ? 100 : 1,
+                      overflow: "visible",
+                    }}
+                  >
                     <CardTrailer
                       movie={m}
                       randomShowLogo={m.vote_average > 7}
                       index={i}
+                      onHoverChange={(isHovered) =>
+                        setHoveredCardIndex(isHovered ? i : null)
+                      }
                     />
                   </SwiperSlide>
                 ))}
@@ -131,4 +141,4 @@ const Slider = ({ movies }) => {
   )
 }
 
-export default Slider;
+export default Slider

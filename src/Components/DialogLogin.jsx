@@ -38,13 +38,12 @@ const DialogLogin = () => {
                 setError("Password should be at least 6 characters")
               } else if (err.message === 'Firebase: Error (auth/invalid-email).') {
                 setError("Invalid email")
-              } else if (err.message === 'INVALID_LOGIN_CREDENTIALS') {
+              } else if (err.message === 'Firebase: Error (auth/invalid-credential).') {
                 setError("Invalid email or password")
               } else {
                 setError("An error occurred")
               }
-            console.error(err)
-        } finally {
+            console.error('err', err.message)
             setLoading(false)
         }
     }
@@ -120,12 +119,12 @@ const DialogLogin = () => {
               "&:disabled": { background: "rgba(255, 255, 255, 0.5)", cursor: "not-allowed" },
             }}
           >
-            {!loading ? (
+            {loading ? (
               <Stack sx={{ width: '100%', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <IconSpinner sx={{ height: '45px' }}/> 
               </Stack>
             ) : (
-              <Typography color={'red'}>
+              <Typography color={'#FFFFFF'}>
                 Sign In
             </Typography>
             )}
