@@ -28,7 +28,7 @@ const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
         <Stack
           sx={{
             position: "relative",
-            width: isHoverCardTrailer ? "100px" : "auto",
+            width: isHoverCardTrailer ? "500px" : "auto",
             height: "100%",
             borderRadius: "10px",
             maxWidth: "400px",
