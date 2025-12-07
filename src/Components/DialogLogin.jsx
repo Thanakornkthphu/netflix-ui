@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { firebaseAuth } from '../Utils/firebase-config'
 import { pages } from '../Routers/path'
+import { IconSpinner } from './core/element/IconSpinner'
 
 const DialogLogin = () => {
     const [error, setError] = useState('')
@@ -11,6 +12,7 @@ const DialogLogin = () => {
         email: '',
         password: ''
     })
+    const [loading, setLoading] = useState(false)
 
     const navigate = useNavigate()
 
@@ -19,6 +21,7 @@ const DialogLogin = () => {
     }
 
     const submitSignIn = async() => {
+        setLoading(true)
         try {
             const { email, password } = data
             const response = await signInWithEmailAndPassword(firebaseAuth, email, password)
@@ -29,14 +32,20 @@ const DialogLogin = () => {
             }
             
         } catch (err) {
-            if (err.message === "Firebase: Error (auth/email-already-in-use).") {
+            if (err.message === 'Firebase: Error (auth/email-already-in-use).') {
                 setError("Email already in use")
-              } else if (err.message === "Firebase: Error (auth/weak-password).") {
+              } else if (err.message === 'Firebase: Error (auth/weak-password).') {
                 setError("Password should be at least 6 characters")
-              } else if (err.message === "Firebase: Error (auth/invalid-email).") {
+              } else if (err.message === 'Firebase: Error (auth/invalid-email).') {
                 setError("Invalid email")
+              } else if (err.message === 'INVALID_LOGIN_CREDENTIALS') {
+                setError("Invalid email or password")
+              } else {
+                setError("An error occurred")
               }
             console.error(err)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -100,6 +109,7 @@ const DialogLogin = () => {
           <Button
             onClick={submitSignIn}
             variant="contained"
+            disabled={loading}
             sx={{
               background: "red",
               width: "100%",
@@ -107,9 +117,18 @@ const DialogLogin = () => {
               fontWeight: 500,
               boxShadow: "none",
               "&:hover": { background: "red", boxShadow: "none" },
+              "&:disabled": { background: "rgba(255, 255, 255, 0.5)", cursor: "not-allowed" },
             }}
           >
-            Sign In
+            {!loading ? (
+              <Stack sx={{ width: '100%', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <IconSpinner sx={{ height: '45px' }}/> 
+              </Stack>
+            ) : (
+              <Typography color={'red'}>
+                Sign In
+            </Typography>
+            )}
           </Button>
         </DialogActions>
 
