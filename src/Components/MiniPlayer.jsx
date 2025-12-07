@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react"
-import { Card, CardContent, Stack, Typography, styled } from "@mui/material"
-import { getGenresFromIds } from "../Utils/util"
+import {
+  Button,
+  Card,
+  CardContent,
+  Stack,
+  Typography,
+  styled,
+} from "@mui/material"
+import { getFormattedDate, getGenresFromIds } from "../Utils/util"
 import { ReactComponent as StarIcon } from "../Assets/star.svg"
+import { ArrowDropDown } from "@mui/icons-material"
+import { FaPlay } from "react-icons/fa"
+import { useNavigate } from "react-router-dom"
+import { pages } from "../Routers/path"
 
 const MiniPlayer = ({
   isHoverCardTrailer,
@@ -9,9 +20,12 @@ const MiniPlayer = ({
   movie,
   index,
 }) => {
-  const genres = getGenresFromIds(movie.genre_ids)
   const [isVisible, setIsVisible] = useState(false)
+  const [showMoreInfo, setShowMoreInfo] = useState(false)
   const [lastCardOfScreen, setLastCardOfScreen] = useState(1)
+
+  const genres = getGenresFromIds(movie.genre_ids)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const calculateLastCard = () => {
@@ -50,6 +64,8 @@ const MiniPlayer = ({
       return { left: "-50px" }
     }
   }
+
+  console.log("movie", movie)
 
   return (
     <Card
@@ -92,7 +108,66 @@ const MiniPlayer = ({
       </CardContent>
 
       <CardContent sx={{ padding: "0px", margin: "0px" }}>
-        <Stack sx={{ padding: "0px 15px 0px 15px", gap: "10px" }}>
+        <Stack
+          sx={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "10px",
+            padding: "20px 15px 0px 15px",
+          }}
+        >
+          <Button
+            onClick={() => {
+              navigate(`${pages.player.replace(':id', movie.id)}`)
+            }}
+            sx={{
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              border: "1px solid white",
+              padding: "5px 10px",
+              borderRadius: "5px",
+              gap: "10px",
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              color="#FFFFFF"
+              fontSize={"14px"}
+              fontWeight={"600"}
+              textTransform={"capitalize"}
+            >
+              Play
+            </Typography>
+            <FaPlay style={{ fontSize: "14px", color: "#FFFFFF" }} />
+          </Button>
+
+          <ArrowDropDown
+            onClick={() => setShowMoreInfo(!showMoreInfo)}
+            sx={{
+              color: "white",
+              cursor: "pointer",
+              transform: showMoreInfo ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.3s ease-in-out",
+              padding: "5px",
+              borderRadius: "50%",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              border: "1px solid white",
+              "&:hover": {
+                backgroundColor: "#151515",
+                color: "white",
+              },
+            }}
+          />
+        </Stack>
+        <Stack
+          sx={{
+            padding: "20px 15px 0px 15px",
+            gap: "5px",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Typography
             variant="subtitle1"
             color="#fff"
@@ -100,6 +175,17 @@ const MiniPlayer = ({
             fontWeight={"600"}
           >
             {movie.title || movie.original_name}
+          </Typography>
+        </Stack>
+
+        <Stack sx={{ padding: "5px 15px 0px 15px" }}>
+          <Typography
+            variant="subtitle1"
+            color="#fff"
+            fontSize={"14px"}
+            fontWeight={"400"}
+          >
+            {movie.release_date ? getFormattedDate(movie.release_date) : ""}
           </Typography>
         </Stack>
 
@@ -153,6 +239,30 @@ const MiniPlayer = ({
             fontWeight={"500"}
           >
             {genres.join(" • ")}
+          </Typography>
+        </Stack>
+
+        <Stack
+          sx={{
+            padding: "0px 15px 0px 15px",
+            maxHeight: showMoreInfo ? "300px" : "0px",
+            opacity: showMoreInfo ? 1 : 0,
+            overflow: "hidden",
+            transition: "max-height 0.2s ease-in-out, opacity 0.4s ease-in-out",
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            color="#a2a2a2"
+            fontSize={"12px"}
+            fontWeight={"500"}
+            marginTop="10px"
+            sx={{
+              transform: showMoreInfo ? "translateY(0)" : "translateY(-20px)",
+              transition: "transform 0.2s ease-in-out",
+            }}
+          >
+            {movie.overview}
           </Typography>
         </Stack>
       </CardContent>

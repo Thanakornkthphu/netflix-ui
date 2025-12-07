@@ -3,5 +3,5 @@ export const pages = {
     signup: '/sign-up',
     login: '/sign-in',
     resetPassword: '/resetPassword',
-    player: '/player' 
+    player: '/player/:id'
 } 

@@ -4,6 +4,7 @@ import Login from "../Pages/Login"
 import ResetPassword from "../Pages/ResetPassword"
 import ProtectRoute from './ProtectRoute'
 import { pages } from './path'
+import Player from "../Pages/Player"
 
 const AppRoutes = () => {
 
@@ -14,6 +15,7 @@ const AppRoutes = () => {
         <Route exact path={pages.signup} element={<Signup />} />
         <Route exact path={pages.login} element={<Login />} />
         <Route exact path={pages.resetPassword} element={<ResetPassword />} />
+        <Route exact path={pages.player} element={<Player />} />
       </Routes>
     </BrowserRouter>
   )
