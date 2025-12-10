@@ -14,35 +14,18 @@ import { FaPlay } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
 import { pages } from "../Routers/path"
 
-const getLastCardOfScreen = () => {
-  if (typeof window === "undefined") return 6
-  const width = window.innerWidth
-  if (width >= 1200) return 6
-  if (width >= 600) return 3
-  return 1
-}
-
 const MiniPlayer = ({
   isHoverCardTrailer,
   setIsHoverCardTrailer,
   movie,
-  index,
+  edgePosition = "center", // "left" | "center" | "right"
+  positionOffset = 0,
 }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [showMoreInfo, setShowMoreInfo] = useState(false)
-  const [lastCardOfScreen, setLastCardOfScreen] = useState(getLastCardOfScreen)
 
   const genres = getGenresFromIds(movie.genre_ids)
   const navigate = useNavigate()
-
-  useEffect(() => {
-    const handleResize = () => {
-      setLastCardOfScreen(getLastCardOfScreen())
-    }
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
 
   useEffect(() => {
     if (isHoverCardTrailer) {
@@ -56,12 +39,12 @@ const MiniPlayer = ({
   }, [isHoverCardTrailer])
 
   const getPosition = () => {
-    if (index === 0) {
-      return { left: "20px" }
-    } else if (index >= lastCardOfScreen) {
-      return { right: "20px", left: "auto" }
+    if (edgePosition === "left") {
+      return { left: `${positionOffset}px` }
+    } else if (edgePosition === "right") {
+      return { right: `${positionOffset}px`, left: "auto" }
     } else {
-      return { left: "-50px" }
+      return { left: "50%", marginLeft: "-185px" } // 370px / 2 = 185px
     }
   }
 
