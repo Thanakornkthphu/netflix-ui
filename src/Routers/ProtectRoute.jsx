@@ -4,7 +4,7 @@ import Home from '../Pages/Home'
 import { pages } from './path'
 import Player from '../Pages/Player'
 
-const ProtectRoute = ({ path }) => {
+const ProtectRoute = () => {
 
   if (!localStorage.getItem('user')) {
       return <Navigate to={`${pages.signup}`} replace/>

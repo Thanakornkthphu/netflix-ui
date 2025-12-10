@@ -2,8 +2,20 @@ import Header from "../Components/Header"
 import { Stack, Typography } from "@mui/material"
 import backgroundImg from "./../Assets/login.jpg"
 import DialogSignUp from "../Components/DialogSignUp"
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { pages } from "../Routers/path"
 
 const Signup = () => {
+  const navigate = useNavigate()
+  const currentUser = JSON.parse(localStorage.getItem('user'))
+
+  useEffect(() => {
+    if (currentUser) { 
+      navigate(`${pages.home}`)
+    }
+  }, [currentUser])
+
   return (
     <Stack
       sx={{

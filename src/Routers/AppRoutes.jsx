@@ -15,7 +15,6 @@ const AppRoutes = () => {
         <Route exact path={pages.signup} element={<Signup />} />
         <Route exact path={pages.login} element={<Login />} />
         <Route exact path={pages.resetPassword} element={<ResetPassword />} />
-        <Route exact path={pages.player} element={<Player />} />
       </Routes>
     </BrowserRouter>
   )

@@ -1,14 +1,14 @@
 import React, { Children, useEffect } from "react"
 import Navbar from "../Components/Navbar"
+import Footer from "../Components/Footer"
 import { Box, Button, Stack, Typography, styled } from "@mui/material"
 import backgroundImg from "../Assets/home.jpg"
 import title from "../Assets/homeTitle.webp"
-import { FaPlay, FaExclamationCircle, FaAngleLeft } from "react-icons/fa"
+import { FaPlay } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
 import { pages } from "../Routers/path"
 import { useDispatch, useSelector } from "react-redux"
 import { getGenres, fetchMovies } from "../Store"
-import CardTrailer from "../Components/CardTrailer"
 import Slider from "../Components/Slider"
 import { ReactComponent as Top10Icon } from "../Assets/Top10Icon.svg"
 
@@ -47,12 +47,11 @@ const Home = () => {
       <Stack
         sx={{
           width: "100vw",
+          height: "100%",
           minHeight: "100vh",
           background: "black",
-          backgroundImage: `linear-gradient(#00000069, #00000069), url(${backgroundImg})`,
           backgroundSize: "cover",
           backgroundPosition: "bottom",
-          // backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 90%), url(${backgroundImg})`,
           backgroundImage: `linear-gradient(180deg, hsla(0, 0%, 8%, 0) 0, hsla(0, 0%, 8%, .15) 15%, hsla(0, 0%, 8%, .35) 29%, hsla(0, 0%, 8%, .58) 44%, #141414), url(${backgroundImg})`,
           transition:
             "opacity .4s cubic-bezier(.665, .235, .265, .8) 0s, visibility .4s cubic-bezier(.665, .235, .265, .8) 0s",
@@ -61,7 +60,7 @@ const Home = () => {
       >
         <Stack sx={{ padding: "30px 60px" }}>
           <Navbar />
-          <Stack sx={{ position: "absolute", bottom: "20rem" }}>
+          <Stack sx={{ position: "absolute", top: "1.5rem" }}>
             <Box>
               <img src={title} alt={title} style={{ width: "700px" }} />
 
@@ -103,7 +102,9 @@ const Home = () => {
             <Box mt="50px" sx={{ position: "relative" }}>
               <ButtonStyled
                 sx={{ marginRight: "25px" }}
-                onClick={() => navigate(`${pages.player}`)}
+                onClick={() =>
+                  navigate(`${pages.player.replace(":id", "123123")}`)
+                }
               >
                 <FaPlay style={{ marginRight: "10px", fontSize: "1.6rem" }} />
                 <Typography
@@ -116,32 +117,14 @@ const Home = () => {
                   Play
                 </Typography>
               </ButtonStyled>
-              <ButtonStyled
-                sx={{
-                  background: "linear-gradient(#5f5f5fa1, #5f5f5fa1)",
-                  color: "white",
-                }}
-              >
-                <FaExclamationCircle
-                  style={{ marginRight: "10px", fontSize: "1.6rem" }}
-                />
-                <Typography
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: "500",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  More Info
-                </Typography>
-              </ButtonStyled>
             </Box>
           </Stack>
         </Stack>
       </Stack>
-      <Stack sx={{ paddingBottom: "100px", marginTop: "-300px" }}>
+      <Stack sx={{ marginTop: '-100px' }}>
         <Slider movies={dataMovies} genres={genres} isLoading={isLoading} />
       </Stack>
+      <Footer />
     </>
   )
 }

@@ -10,7 +10,7 @@ const Header = () => {
   const [buttonText, setButtonText] = useState('Sign In')
   const [user, setUser] = useState(null)
   const [showButton, setShowButton] = useState(true)
-  
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const Header = () => {
     }
   })
 
-  const onSubmit = async() => {
+  const onSubmit = async () => {
     if (user !== null) {
       try {
         await signOut(firebaseAuth)
@@ -50,16 +50,25 @@ const Header = () => {
         alignItems: "center",
       }}
     >
-      <img src={Logo} alt="Netflix Logo" style={{ width: "150px", cursor: 'pointer' }} onClick={() => navigate(`${pages.home}`)}/>
-        {showButton && (
-          <Button
-            onClick={onSubmit}
-            variant="contained"
-            sx={{ background: "red", cursor: 'pointer', "&:hover": { background: "red" } }}
-          >
-            {buttonText}
-          </Button>
-        )}
+      <img
+        src={Logo}
+        alt="Netflix Logo"
+        style={{ width: "150px", cursor: "pointer" }}
+        onClick={() => navigate(`${pages.home}`)}
+      />
+      {showButton && (
+        <Button
+          onClick={onSubmit}
+          variant="contained"
+          sx={{
+            background: "red",
+            cursor: "pointer",
+            "&:hover": { background: "red" },
+          }}
+        >
+          {buttonText}
+        </Button>
+      )}
     </Stack>
   )
 }
