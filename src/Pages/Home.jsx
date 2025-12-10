@@ -122,7 +122,7 @@ const Home = () => {
         </Stack>
       </Stack>
       <Stack sx={{ marginTop: '-100px' }}>
-        <Slider movies={dataMovies} genres={genres} isLoading={isLoading} />
+        <Slider movies={dataMovies} isLoading={isLoading} />
       </Stack>
       <Footer />
     </>
