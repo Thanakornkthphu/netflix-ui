@@ -1,3 +1,4 @@
+import React, { useState, useCallback, forwardRef } from "react"
 import {
   Button,
   Dialog,
@@ -9,45 +10,46 @@ import {
   TextField,
   styled,
 } from "@mui/material"
-import React, { useState } from "react"
 import { createUserWithEmailAndPassword } from "firebase/auth"
-import { firebaseAuth } from "../Utils/firebase-config"
 import { useNavigate } from "react-router-dom"
+
+import { firebaseAuth } from "../Utils/firebase-config"
 import { pages } from "../Routers/path"
+import { getAuthErrorMessage } from "../Utils/authErrors"
+import { COLORS } from "../Utils/constants"
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />
-})
+const Transition = forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+))
 
-const DigalogSignUp = () => {
-  const [open, setOpen] = useState(false)
+const DialogSignUp = () => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [formData, setFormData] = useState({ email: "", password: "" })
   const [error, setError] = useState("")
-  const [data, setData] = useState({
-    email: "",
-    password: "",
-  })
 
   const navigate = useNavigate()
 
-  const handleOpenDialog = () => {
-    setOpen(true)
-  }
+  const handleOpen = useCallback(() => {
+    setIsOpen(true)
+  }, [])
 
-  const handleCloseDialog = () => {
-    setOpen(false)
-    setData({ email: "", password: "" })
+  const handleClose = useCallback(() => {
+    setIsOpen(false)
+    setFormData({ email: "", password: "" })
     setError("")
-  }
+  }, [])
 
-  const onChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value })
-  }
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+    setError("")
+  }, [])
 
-  const createAccount = async () => {
+  const handleCreateAccount = useCallback(async () => {
     setError("")
 
     try {
-      const { email, password } = data
+      const { email, password } = formData
       const response = await createUserWithEmailAndPassword(
         firebaseAuth,
         email,
@@ -55,138 +57,136 @@ const DigalogSignUp = () => {
       )
 
       if (response) {
-        localStorage.setItem('user', JSON.stringify(response.user))
-        navigate(`${pages.home}`)
+        localStorage.setItem("user", JSON.stringify(response.user))
+        navigate(pages.home)
       }
     } catch (err) {
-      console.error(err)
+      setError(getAuthErrorMessage(err))
+      console.error("Sign up error:", err.message)
+    }
+  }, [formData, navigate])
 
-      if (err.message === "Firebase: Error (auth/email-already-in-use).") {
-        setError("Email already in use")
-      } else if (err.message === "Firebase: Error (auth/weak-password).") {
-        setError("Password should be at least 6 characters")
-      } else if (err.message === "Firebase: Error (auth/invalid-email).") {
-        setError("Invalid email")
+  const handleKeyUp = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault()
+        handleCreateAccount()
       }
-    }
-  }
-
-  const onKeyUp = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      createAccount()
-    }
-  }
+    },
+    [handleCreateAccount]
+  )
 
   return (
     <>
-      <Button
-        variant="contained"
-        sx={{
-          marginTop: "20px",
-          background: "red",
-          width: "12rem",
-          height: "45px",
-          "&:hover": { background: "red" },
-        }}
-        onClick={() => handleOpenDialog()}
-      >
+      <GetStartedButton variant="contained" onClick={handleOpen}>
         Get Started
-      </Button>
+      </GetStartedButton>
 
-      <DialogStyled
-        open={open}
+      <StyledDialog
+        open={isOpen}
         TransitionComponent={Transition}
         keepMounted
-        onClose={handleCloseDialog}
+        onClose={handleClose}
       >
-        <DialogTitle
-          sx={{
-            color: "white",
-            padding: "30px 68px",
-            fontWeight: 800,
-            fontSize: "2rem",
-          }}
-        >
-          Create your Account
-        </DialogTitle>
+        <DialogTitle sx={styles.title}>Create your Account</DialogTitle>
 
-        <DialogContent sx={{ padding: "0 68px" }}>
+        <DialogContent sx={styles.content}>
           <DialogContentText>
-            <InputStyled
+            <StyledInput
               placeholder="Email address"
               name="email"
-              onChange={onChange}
-              notched={false}
+              type="email"
+              onChange={handleInputChange}
+              autoComplete="email"
             />
           </DialogContentText>
+
           <DialogContentText sx={{ marginTop: "20px" }}>
-            <InputStyled
+            <StyledInput
               placeholder="Password"
               name="password"
-              onChange={onChange}
-              notched={false}
               type="password"
-              onKeyUp={onKeyUp} 
+              onChange={handleInputChange}
+              onKeyUp={handleKeyUp}
+              autoComplete="new-password"
             />
           </DialogContentText>
 
-          {error.length > 0 && (
-            <DialogContentText
-              sx={{ marginTop: "20px", color: "red", fontWeight: 600 }}
-            >
-              {error}
-            </DialogContentText>
-          )}
+          {error && <ErrorMessage>{error}</ErrorMessage>}
         </DialogContent>
 
-        <DialogActions
-          sx={{
-            justifyContent: "center",
-            padding: "30px 68px",
-          }}
-        >
-          <Button
-            onClick={createAccount}
-            variant="contained"
-            sx={{
-              background: "red",
-              width: "12rem",
-              height: "45px",
-              fontWeight: 500,
-              boxShadow: "none",
-              "&:hover": { background: "red", boxShadow: "none" },
-            }}
-          >
+        <DialogActions sx={styles.actions}>
+          <SubmitButton onClick={handleCreateAccount} variant="contained">
             Create
-          </Button>
+          </SubmitButton>
         </DialogActions>
-      </DialogStyled>
+      </StyledDialog>
     </>
   )
 }
 
-const InputStyled = styled(TextField)`
-  width: 25rem;
-  background: white;
-  outline: none;
-  border-radius: 4px;
+// Styles
+const styles = {
+  title: {
+    color: COLORS.text,
+    padding: "30px 68px",
+    fontWeight: 800,
+    fontSize: "2rem",
+  },
+  content: {
+    padding: "0 68px",
+  },
+  actions: {
+    justifyContent: "center",
+    padding: "30px 68px",
+  },
+}
 
-  .MuiOutlinedInput-notchedOutline {
-    border: none;
-  }
-`
+// Styled Components
+const GetStartedButton = styled(Button)({
+  marginTop: "20px",
+  background: COLORS.primary,
+  width: "12rem",
+  height: "45px",
+  "&:hover": {
+    background: COLORS.primaryHover,
+  },
+})
 
-const DialogStyled = styled(Dialog)`
-  background: none;
+const StyledDialog = styled(Dialog)({
+  "& .MuiBackdrop-root": {
+    backgroundColor: "rgba(0, 0, 0, 0.74)",
+  },
+  "& .MuiDialog-paper": {
+    background: "rgba(84, 84, 84, 0.67)",
+  },
+})
 
-  .MuiBackdrop-root {
-    background-color: rgb(0 0 0 / 74%);
-  }
+const StyledInput = styled(TextField)({
+  width: "25rem",
+  background: COLORS.text,
+  borderRadius: "4px",
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+})
 
-  .MuiDialog-paper {
-    background: rgb(84 84 84 / 67%);
-  }
-`
+const SubmitButton = styled(Button)({
+  background: COLORS.primary,
+  width: "12rem",
+  height: "45px",
+  fontWeight: 500,
+  boxShadow: "none",
+  "&:hover": {
+    background: COLORS.primaryHover,
+    boxShadow: "none",
+  },
+})
 
-export default DigalogSignUp
+const ErrorMessage = styled(DialogContentText)({
+  marginTop: "20px",
+  color: COLORS.primary,
+  fontWeight: 600,
+})
+
+export default DialogSignUp

@@ -7,45 +7,54 @@ import {
   Typography,
   styled,
 } from "@mui/material"
-import { getFormattedDate, getGenresFromIds } from "../Utils/util"
-import { ReactComponent as StarIcon } from "../Assets/star.svg"
 import { ArrowDropDown } from "@mui/icons-material"
 import { FaPlay } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
+
+import { getFormattedDate, getGenresFromIds } from "../Utils/util"
 import { pages } from "../Routers/path"
+import { COLORS, MINI_PLAYER_WIDTH, Z_INDEX } from "../Utils/constants"
+import { ReactComponent as StarIcon } from "../Assets/star.svg"
 
 const MiniPlayer = ({
-  isHoverCardTrailer,
-  setIsHoverCardTrailer,
   movie,
-  edgePosition = "center", // "left" | "center" | "right"
+  isVisible,
+  onHoverChange,
+  edgePosition = "center",
   positionOffset = 0,
 }) => {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isAnimated, setIsAnimated] = useState(false)
   const [showMoreInfo, setShowMoreInfo] = useState(false)
 
   const genres = getGenresFromIds(movie.genre_ids)
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (isHoverCardTrailer) {
-      const timer = setTimeout(() => {
-        setIsVisible(true)
-      }, 0)
+    if (isVisible) {
+      const timer = setTimeout(() => setIsAnimated(true), 0)
       return () => clearTimeout(timer)
     } else {
-      setIsVisible(false)
+      setIsAnimated(false)
     }
-  }, [isHoverCardTrailer])
+  }, [isVisible])
 
   const getPosition = () => {
-    if (edgePosition === "left") {
-      return { left: `${positionOffset}px` }
-    } else if (edgePosition === "right") {
-      return { right: `${positionOffset}px`, left: "auto" }
-    } else {
-      return { left: "50%", marginLeft: "-185px" } // 370px / 2 = 185px
+    switch (edgePosition) {
+      case "left":
+        return { left: `${positionOffset}px` }
+      case "right":
+        return { right: `${positionOffset}px`, left: "auto" }
+      default:
+        return { left: "50%", marginLeft: `-${MINI_PLAYER_WIDTH / 2}px` }
     }
+  }
+
+  const handlePlay = () => {
+    navigate(pages.player.replace(":id", movie.id))
+  }
+
+  const toggleMoreInfo = () => {
+    setShowMoreInfo((prev) => !prev)
   }
 
   return (
@@ -54,204 +63,172 @@ const MiniPlayer = ({
         position: "absolute",
         ...getPosition(),
         top: "-50px",
-        width: "370px",
+        width: `${MINI_PLAYER_WIDTH}px`,
         minHeight: "370px",
         height: "auto",
         borderRadius: "8px",
         overflow: "hidden",
-        transform: isVisible ? "scale(1.1)" : "scale(0.85)",
-        opacity: isHoverCardTrailer ? 1 : 0,
+        transform: isAnimated ? "scale(1.1)" : "scale(0.85)",
+        opacity: isVisible ? 1 : 0,
         transition:
           "transform 0.35s cubic-bezier(0.34, 1.56, 0.34, 1), opacity 0.25s ease-out, box-shadow 0.3s ease-out",
-        zIndex: 999,
-        boxShadow: isHoverCardTrailer
+        zIndex: Z_INDEX.miniPlayer,
+        boxShadow: isVisible
           ? "0px 8px 20px rgba(0,0,0,0.45)"
           : "0px 2px 10px rgba(0,0,0,0.25)",
         cursor: "pointer",
-        backgroundColor: "rgb(18, 18, 18)",
-        pointerEvents: isHoverCardTrailer ? "auto" : "none",
+        backgroundColor: COLORS.backgroundCard,
+        pointerEvents: isVisible ? "auto" : "none",
         transformOrigin: "center center",
         willChange: "transform, opacity",
       }}
-      onMouseEnter={() => setIsHoverCardTrailer(true)}
-      onMouseLeave={() => setIsHoverCardTrailer(false)}
+      onMouseEnter={() => onHoverChange(true)}
+      onMouseLeave={() => onHoverChange(false)}
     >
-      <CardContent sx={{ padding: "0px", height: "300px" }}>
-        <Iframe
+      {/* Video Preview */}
+      <CardContent sx={{ padding: 0, height: "300px" }}>
+        <VideoFrame
           src="https://www.youtube.com/embed/UdF25ZqWV7g?autoplay=1&mute=0&loop=1&controls=1&playlist=UdF25ZqWV7g"
           allow="autoplay; fullscreen"
+          title="Movie Preview"
         />
       </CardContent>
 
-      <CardContent sx={{ padding: "0px", margin: "0px" }}>
+      {/* Movie Info */}
+      <CardContent sx={{ padding: 0 }}>
+        {/* Actions */}
         <Stack
-          sx={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "10px",
-            padding: "20px 15px 0px 15px",
-          }}
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ padding: "20px 15px 0" }}
         >
-          <Button
-            onClick={() => {
-              navigate(`${pages.player.replace(":id", movie.id)}`)
-            }}
-            sx={{
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              border: "1px solid white",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              gap: "10px",
-            }}
-          >
-            <Typography
-              variant="subtitle1"
-              color="#FFFFFF"
-              fontSize={"14px"}
-              fontWeight={"600"}
-              textTransform={"capitalize"}
-            >
+          <PlayButton onClick={handlePlay}>
+            <Typography fontSize="14px" fontWeight={600} color={COLORS.text}>
               Play
             </Typography>
-            <FaPlay style={{ fontSize: "14px", color: "#FFFFFF" }} />
-          </Button>
+            <FaPlay style={{ fontSize: "14px", color: COLORS.text }} />
+          </PlayButton>
 
-          <ArrowDropDown
-            onClick={() => setShowMoreInfo(!showMoreInfo)}
-            sx={{
-              color: "white",
-              cursor: "pointer",
-              transform: showMoreInfo ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s ease-in-out",
-              padding: "5px",
-              borderRadius: "50%",
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              border: "1px solid white",
-              "&:hover": {
-                backgroundColor: "#151515",
-                color: "white",
-              },
-            }}
-          />
+          <ExpandButton onClick={toggleMoreInfo} $expanded={showMoreInfo}>
+            <ArrowDropDown />
+          </ExpandButton>
         </Stack>
-        <Stack
-          sx={{
-            padding: "20px 15px 0px 15px",
-            gap: "5px",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            color="#fff"
-            fontSize={"14px"}
-            fontWeight={"600"}
-          >
+
+        {/* Title */}
+        <Stack sx={{ padding: "20px 15px 0" }}>
+          <Typography fontSize="14px" fontWeight={600} color={COLORS.text}>
             {movie.title || movie.original_name}
           </Typography>
         </Stack>
 
-        <Stack sx={{ padding: "5px 15px 0px 15px" }}>
-          <Typography
-            variant="subtitle1"
-            color="#fff"
-            fontSize={"14px"}
-            fontWeight={"400"}
-          >
+        {/* Release Date */}
+        <Stack sx={{ padding: "5px 15px 0" }}>
+          <Typography fontSize="14px" fontWeight={400} color={COLORS.text}>
             {movie.release_date ? getFormattedDate(movie.release_date) : ""}
           </Typography>
         </Stack>
 
+        {/* Media Type & Rating */}
         <Stack
-          mt="10px"
-          sx={{
-            padding: "0px 15px 0px 15px",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "5px",
-          }}
+          direction="row"
+          alignItems="center"
+          gap="5px"
+          sx={{ padding: "10px 15px 0" }}
         >
-          <Typography
-            variant="subtitle1"
-            color="#a2a2a2"
-            fontSize={"12px"}
-            fontWeight={"500"}
-            border={"1px solid white"}
-            padding={"0px 3px"}
-            lineHeight={"19px"}
-            minWidth={"30px"}
-            textAlign={"center"}
-          >
-            {movie.media_type}
-          </Typography>
+          <MediaTypeBadge>{movie.media_type}</MediaTypeBadge>
           <StarIcon style={{ width: "14px", height: "14px" }} />
           <Typography
-            mt="2px"
-            variant="subtitle1"
-            color="#a2a2a2"
-            fontSize={"12px"}
-            fontWeight={"500"}
+            fontSize="12px"
+            fontWeight={500}
+            color={COLORS.textSecondary}
           >
-            {movie.vote_average.toFixed(1)}
+            {movie.vote_average?.toFixed(1)}
           </Typography>
         </Stack>
 
-        <Stack
-          mt="10px"
-          sx={{
-            padding: "0px 15px 0px 15px",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
+        {/* Genres */}
+        <Stack sx={{ padding: "10px 15px 0" }}>
           <Typography
-            variant="subtitle1"
-            color="#a2a2a2"
-            fontSize={"12px"}
-            fontWeight={"500"}
+            fontSize="12px"
+            fontWeight={500}
+            color={COLORS.textSecondary}
           >
             {genres.join(" • ")}
           </Typography>
         </Stack>
 
-        <Stack
-          sx={{
-            padding: "0px 15px 0px 15px",
-            maxHeight: showMoreInfo ? "300px" : "0px",
-            opacity: showMoreInfo ? 1 : 0,
-            overflow: "hidden",
-            transition: "max-height 0.2s ease-in-out, opacity 0.4s ease-in-out",
-          }}
-        >
+        {/* Overview (Expandable) */}
+        <ExpandableContent $expanded={showMoreInfo}>
           <Typography
-            variant="subtitle1"
-            color="#a2a2a2"
-            fontSize={"12px"}
-            fontWeight={"500"}
-            marginTop="10px"
+            fontSize="12px"
+            fontWeight={500}
+            color={COLORS.textSecondary}
             sx={{
+              marginTop: "10px",
               transform: showMoreInfo ? "translateY(0)" : "translateY(-20px)",
               transition: "transform 0.2s ease-in-out",
             }}
           >
             {movie.overview}
           </Typography>
-        </Stack>
+        </ExpandableContent>
       </CardContent>
     </Card>
   )
 }
 
-const Iframe = styled("iframe")`
-  width: 100%;
-  height: 100%;
-  border: none;
-  object-fit: cover;
-  will-change: transform, opacity;
-`
+// Styled Components
+const VideoFrame = styled("iframe")({
+  width: "100%",
+  height: "100%",
+  border: "none",
+  objectFit: "cover",
+})
+
+const PlayButton = styled(Button)({
+  backgroundColor: "rgba(255, 255, 255, 0.1)",
+  border: `1px solid ${COLORS.text}`,
+  padding: "5px 10px",
+  borderRadius: "5px",
+  gap: "10px",
+  textTransform: "capitalize",
+})
+
+const ExpandButton = styled("button")(({ $expanded }) => ({
+  background: "rgba(255, 255, 255, 0.1)",
+  border: `1px solid ${COLORS.text}`,
+  borderRadius: "50%",
+  padding: "5px",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: COLORS.text,
+  transform: $expanded ? "rotate(180deg)" : "rotate(0deg)",
+  transition: "transform 0.3s ease-in-out, background-color 0.2s ease",
+  "&:hover": {
+    backgroundColor: "#151515",
+  },
+}))
+
+const MediaTypeBadge = styled(Typography)({
+  fontSize: "12px",
+  fontWeight: 500,
+  color: COLORS.textSecondary,
+  border: `1px solid ${COLORS.text}`,
+  padding: "0 3px",
+  lineHeight: "19px",
+  minWidth: "30px",
+  textAlign: "center",
+})
+
+const ExpandableContent = styled(Stack)(({ $expanded }) => ({
+  padding: "0 15px",
+  maxHeight: $expanded ? "300px" : "0",
+  opacity: $expanded ? 1 : 0,
+  overflow: "hidden",
+  transition: "max-height 0.2s ease-in-out, opacity 0.4s ease-in-out",
+}))
 
 export default MiniPlayer

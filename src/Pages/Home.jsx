@@ -1,145 +1,135 @@
-import React, { Children, useEffect } from "react"
-import Navbar from "../Components/Navbar"
-import Footer from "../Components/Footer"
+import React, { useEffect, useMemo } from "react"
 import { Box, Button, Stack, Typography, styled } from "@mui/material"
-import backgroundImg from "../Assets/home.jpg"
-import title from "../Assets/homeTitle.webp"
 import { FaPlay } from "react-icons/fa"
 import { useNavigate } from "react-router-dom"
-import { pages } from "../Routers/path"
 import { useDispatch, useSelector } from "react-redux"
-import { getGenres, fetchMovies } from "../Store"
+
+import Navbar from "../Components/Navbar"
+import Footer from "../Components/Footer"
 import Slider from "../Components/Slider"
+import { getGenres, fetchMovies } from "../Store"
+import { pages } from "../Routers/path"
+import { COLORS } from "../Utils/constants"
+
+import backgroundImg from "../Assets/home.jpg"
+import titleImg from "../Assets/homeTitle.webp"
 import { ReactComponent as Top10Icon } from "../Assets/Top10Icon.svg"
 
 const Home = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const movies = useSelector((state) => state.netflix.movies)
-  const genres = useSelector((state) => state.netflix.genres)
-  const genresLoaded = useSelector((state) => state.netflix.genresLoaded)
-  const isLoading = useSelector((state) => state.netflix.isLoading)
+  const { movies, genres, genresLoaded, isLoading } = useSelector(
+    (state) => state.netflix
+  )
 
   useEffect(() => {
     dispatch(getGenres())
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     if (genresLoaded) {
       dispatch(fetchMovies({ type: "all" }))
     }
-  }, [genresLoaded])
+  }, [genresLoaded, dispatch])
 
-  const dataMovies = genres.map((genre) => {
-    return {
+  const categorizedMovies = useMemo(() => {
+    return genres.map((genre) => ({
       ...genre,
       movies: movies.filter(
         (movie, index, self) =>
           movie.genre_ids.includes(genre.id) &&
           self.findIndex((m) => m.id === movie.id) === index
       ),
-    }
-  })
+    }))
+  }, [genres, movies])
+
+  const handlePlay = () => {
+    navigate(pages.player.replace(":id", "123123"))
+  }
 
   return (
     <>
       <Navbar />
 
-      <Stack
-        sx={{
-          width: "100vw",
-          height: "100%",
-          minHeight: "100vh",
-          background: "black",
-          backgroundSize: "cover",
-          backgroundPosition: "bottom",
-          backgroundImage: `linear-gradient(180deg, hsla(0, 0%, 8%, 0) 0, hsla(0, 0%, 8%, .15) 15%, hsla(0, 0%, 8%, .35) 29%, hsla(0, 0%, 8%, .58) 44%, #141414), url(${backgroundImg})`,
-          transition:
-            "opacity .4s cubic-bezier(.665, .235, .265, .8) 0s, visibility .4s cubic-bezier(.665, .235, .265, .8) 0s",
-          overflowX: "hidden",
-        }}
-      >
-        <Stack sx={{ padding: "100px 60px 30px 60px" }}>
+      <HeroSection backgroundImg={backgroundImg}>
+        <HeroContent>
           <Box sx={{ marginTop: "-100px" }}>
-            <img src={title} alt={title} style={{ width: "700px" }} />
+            <img
+              src={titleImg}
+              alt="Featured Title"
+              style={{ width: "700px" }}
+            />
 
             <Stack
-              sx={{
-                marginTop: "20px",
-                flexDirection: "row",
-                gap: "15px",
-                alignItems: "center",
-              }}
+              direction="row"
+              alignItems="center"
+              gap="15px"
+              sx={{ marginTop: "20px" }}
             >
               <Top10Icon style={{ width: "50px", maxWidth: "50px" }} />
-              <Typography
-                style={{
-                  fontSize: "1.6rem",
-                  fontWeight: "600",
-                  textTransform: "capitalize",
-                  color: "white",
-                }}
-              >
-                No.2 in Films Today
-              </Typography>
+              <HeroText variant="subtitle">No.2 in Films Today</HeroText>
             </Stack>
 
-            <Stack mt="20px" sx={{ width: "auto", maxWidth: "700px" }}>
-              <Typography
-                style={{
-                  fontSize: "1.6rem",
-                  fontWeight: "400",
-                  textTransform: "capitalize",
-                  color: "white",
-                }}
-              >
+            <Stack mt="20px" sx={{ maxWidth: "700px" }}>
+              <HeroText variant="description">
                 Kids in 1980s Hawkins face secret experiments, supernatural
                 forces, and a mysterious girl named Eleven.
-              </Typography>
+              </HeroText>
             </Stack>
           </Box>
 
-          <Box mt="50px" sx={{ position: "relative" }}>
-            <ButtonStyled
-              onClick={() =>
-                navigate(`${pages.player.replace(":id", "123123")}`)
-              }
-            >
+          <Box mt="50px">
+            <PlayButton onClick={handlePlay}>
               <FaPlay style={{ marginRight: "10px", fontSize: "1.6rem" }} />
-              <Typography
-                style={{
-                  fontSize: "18px",
-                  fontWeight: "600",
-                  textTransform: "capitalize",
-                }}
-              >
+              <Typography fontSize="18px" fontWeight="600">
                 Play
               </Typography>
-            </ButtonStyled>
+            </PlayButton>
           </Box>
-        </Stack>
-      </Stack>
+        </HeroContent>
+      </HeroSection>
 
       <Box sx={{ marginTop: "-100px" }}>
-        <Slider movies={dataMovies} isLoading={isLoading} />
+        <Slider movies={categorizedMovies} isLoading={isLoading} />
       </Box>
+
       <Footer />
     </>
   )
 }
 
-const ButtonStyled = styled(Button)`
-  background: white;
-  color: black;
-  font-weight: 600;
-  padding: 7px 30px;
-  height: 45px;
-  margin-right: 25px;
+// Styled Components
+const HeroSection = styled(Stack)(({ backgroundImg }) => ({
+  width: "100vw",
+  minHeight: "100vh",
+  background: COLORS.backgroundDark,
+  backgroundSize: "cover",
+  backgroundPosition: "bottom",
+  backgroundImage: `linear-gradient(180deg, hsla(0, 0%, 8%, 0) 0, hsla(0, 0%, 8%, .15) 15%, hsla(0, 0%, 8%, .35) 29%, hsla(0, 0%, 8%, .58) 44%, ${COLORS.background}), url(${backgroundImg})`,
+  overflowX: "hidden",
+}))
 
-  :hover {
-    background: #d3d3d3;
-  }
-`
+const HeroContent = styled(Stack)({
+  padding: "100px 60px 30px 60px",
+})
+
+const HeroText = styled(Typography)(({ variant }) => ({
+  fontSize: variant === "subtitle" ? "1.6rem" : "1.6rem",
+  fontWeight: variant === "subtitle" ? 600 : 400,
+  color: COLORS.text,
+}))
+
+const PlayButton = styled(Button)({
+  background: COLORS.text,
+  color: COLORS.backgroundDark,
+  fontWeight: 600,
+  padding: "7px 30px",
+  height: "45px",
+  marginRight: "25px",
+  "&:hover": {
+    background: "#d3d3d3",
+  },
+})
 
 export default Home

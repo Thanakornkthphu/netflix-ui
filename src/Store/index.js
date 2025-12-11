@@ -1,63 +1,94 @@
 import { configureStore, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import moviesAPI from "./APIs/APIs"
+
+// Initial State
 const initialState = {
   movies: [],
-  genresLoaded: false,
   genres: [],
+  genresLoaded: false,
   isLoading: false,
+  error: null,
 }
 
-export const getGenres = createAsyncThunk("netflix/genres", async () => {
-  try {
-    const response = await moviesAPI.genreMovies()
-    return response.data.genres
-  } catch (err) {
-    console.error(err)
-  }
-})
-
-export const fetchMovies = createAsyncThunk(
-  "netflix/trending",
-  async ({ type }, thunkApi) => {
-    const state = thunkApi.getState()
-    const genres = state.netflix.genres
-
+// Async Thunks
+export const getGenres = createAsyncThunk(
+  "netflix/getGenres",
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await moviesAPI.getRawData(type, genres, "")
-      console.log("response", response)
-
-      return response
+      const response = await moviesAPI.getGenres()
+      return response.data.genres
     } catch (error) {
-      console.error(error)
+      console.error("Error fetching genres:", error)
+      return rejectWithValue(error.message)
     }
   }
 )
 
-const netFlixSlice = createSlice({
+export const fetchMovies = createAsyncThunk(
+  "netflix/fetchMovies",
+  async ({ type }, { getState, rejectWithValue }) => {
+    try {
+      const { genres } = getState().netflix
+      const movies = await moviesAPI.getTrendingMovies(type, genres)
+      return movies
+    } catch (error) {
+      console.error("Error fetching movies:", error)
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+// Slice
+const netflixSlice = createSlice({
   name: "netflix",
   initialState,
+  reducers: {
+    clearError: (state) => {
+      state.error = null
+    },
+  },
   extraReducers: (builder) => {
-    builder.addCase(getGenres.fulfilled, (state, action) => {
-      state.genres = action.payload
-      state.genresLoaded = true
-    })
-
-    builder.addCase(fetchMovies.pending, (state) => {
-      state.isLoading = true
-    })
-    builder.addCase(fetchMovies.fulfilled, (state, action) => {
-      state.movies = action.payload
-      state.genresLoaded = true
-      state.isLoading = false
-    })
-    builder.addCase(fetchMovies.rejected, (state) => {
-      state.isLoading = false
-    })
+    builder
+      // Get Genres
+      .addCase(getGenres.pending, (state) => {
+        state.error = null
+      })
+      .addCase(getGenres.fulfilled, (state, action) => {
+        state.genres = action.payload
+        state.genresLoaded = true
+      })
+      .addCase(getGenres.rejected, (state, action) => {
+        state.error = action.payload
+      })
+      // Fetch Movies
+      .addCase(fetchMovies.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(fetchMovies.fulfilled, (state, action) => {
+        state.movies = action.payload
+        state.isLoading = false
+      })
+      .addCase(fetchMovies.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload
+      })
   },
 })
 
+// Actions
+export const { clearError } = netflixSlice.actions
+
+// Store
 export const store = configureStore({
   reducer: {
-    netflix: netFlixSlice.reducer,
+    netflix: netflixSlice.reducer,
   },
 })
+
+// Selectors
+export const selectMovies = (state) => state.netflix.movies
+export const selectGenres = (state) => state.netflix.genres
+export const selectIsLoading = (state) => state.netflix.isLoading
+export const selectGenresLoaded = (state) => state.netflix.genresLoaded
+export const selectError = (state) => state.netflix.error

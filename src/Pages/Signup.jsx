@@ -1,31 +1,29 @@
-import Header from "../Components/Header"
+import React, { useEffect } from "react"
 import { Stack, Typography } from "@mui/material"
-import backgroundImg from "./../Assets/login.jpg"
-import DialogSignUp from "../Components/DialogSignUp"
-import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+
+import Header from "../Components/Header"
+import DialogSignUp from "../Components/DialogSignUp"
 import { pages } from "../Routers/path"
+import { AUTH_PAGE_STYLES, COLORS } from "../Utils/constants"
+
+import backgroundImg from "../Assets/login.jpg"
 
 const Signup = () => {
   const navigate = useNavigate()
-  const currentUser = JSON.parse(localStorage.getItem('user'))
 
   useEffect(() => {
-    if (currentUser) { 
-      navigate(`${pages.home}`)
+    const user = localStorage.getItem("user")
+    if (user) {
+      navigate(pages.home)
     }
-  }, [currentUser])
+  }, [navigate])
 
   return (
     <Stack
       sx={{
-        width: "100vw",
-        height: "100vh",
-        backgroundSize: "cover",
-        position: "relative",
+        ...AUTH_PAGE_STYLES,
         backgroundImage: `linear-gradient(#00000069, #00000069), url(${backgroundImg})`,
-        backdropFilter: "blur(10px)",
-        backgroundPosition: 'center',
       }}
     >
       <Stack sx={{ padding: "30px 60px" }}>
@@ -34,7 +32,7 @@ const Signup = () => {
         <Stack
           mt="100px"
           sx={{
-            color: "white",
+            color: COLORS.text,
             justifyContent: "center",
             alignItems: "center",
             textAlign: "center",
@@ -43,21 +41,21 @@ const Signup = () => {
         >
           <Typography
             variant="h1"
-            fontWeight={"800"}
-            fontSize={"48px"}
-            lineHeight={"65px"}
+            fontWeight={800}
+            fontSize="48px"
+            lineHeight="65px"
           >
             Unlimited movies, TV shows and more
           </Typography>
           <Typography
             variant="h4"
-            fontWeight={"600"}
-            fontSize={"30px"}
-            lineHeight={"65px"}
+            fontWeight={600}
+            fontSize="30px"
+            lineHeight="65px"
           >
             Watch anywhere. Cancel anytime.
           </Typography>
-          <Typography variant="h6" fontWeight={"600"} lineHeight={"65px"}>
+          <Typography variant="h6" fontWeight={600} lineHeight="65px">
             Ready to watch? Enter your email to create or restart your
             membership.
           </Typography>

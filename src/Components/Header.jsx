@@ -1,76 +1,82 @@
-import { Button, Stack } from "@mui/material"
-import React, { useEffect, useState } from "react"
-import Logo from "../Assets/logo-netflix.png"
-import { useNavigate } from "react-router-dom"
+import React, { useEffect, useState, useCallback } from "react"
+import { Button, Stack, styled } from "@mui/material"
+import { useNavigate, useLocation } from "react-router-dom"
 import { onAuthStateChanged, signOut } from "firebase/auth"
+
 import { firebaseAuth } from "../Utils/firebase-config"
 import { pages } from "../Routers/path"
+import { COLORS } from "../Utils/constants"
+
+import Logo from "../Assets/logo-netflix.png"
 
 const Header = () => {
-  const [buttonText, setButtonText] = useState('Sign In')
-  const [user, setUser] = useState(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [showButton, setShowButton] = useState(true)
 
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
-    if (window.location.pathname === `${pages.login}`) {
-      setShowButton(false)
-    }
+    // Hide button on login page
+    setShowButton(location.pathname !== pages.login)
+  }, [location.pathname])
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      setIsAuthenticated(!!user)
+    })
+    return () => unsubscribe()
   }, [])
 
-  onAuthStateChanged(firebaseAuth, (user) => {
-    if (user) {
-      setButtonText('Sign Out')
-      setUser(user)
-    }
-  })
-
-  const onSubmit = async () => {
-    if (user !== null) {
+  const handleAuthAction = useCallback(async () => {
+    if (isAuthenticated) {
       try {
         await signOut(firebaseAuth)
-        localStorage.removeItem('user')
-        setButtonText('Sign In')
-        setUser(null)
-      } catch (err) {
-        console.error(err)
+        localStorage.removeItem("user")
+        setIsAuthenticated(false)
+      } catch (error) {
+        console.error("Sign out error:", error)
       }
     } else {
-      navigate(`${pages.login}`)
+      navigate(pages.login)
     }
-  }
+  }, [isAuthenticated, navigate])
+
+  const handleLogoClick = useCallback(() => {
+    navigate(pages.home)
+  }, [navigate])
 
   return (
-    <Stack
-      sx={{
-        height: "60px",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <img
-        src={Logo}
-        alt="Netflix Logo"
-        style={{ width: "150px", cursor: "pointer" }}
-        onClick={() => navigate(`${pages.home}`)}
-      />
+    <HeaderContainer>
+      <LogoImage src={Logo} alt="Netflix Logo" onClick={handleLogoClick} />
+
       {showButton && (
-        <Button
-          onClick={onSubmit}
-          variant="contained"
-          sx={{
-            background: "red",
-            cursor: "pointer",
-            "&:hover": { background: "red" },
-          }}
-        >
-          {buttonText}
-        </Button>
+        <AuthButton onClick={handleAuthAction} variant="contained">
+          {isAuthenticated ? "Sign Out" : "Sign In"}
+        </AuthButton>
       )}
-    </Stack>
+    </HeaderContainer>
   )
 }
+
+// Styled Components
+const HeaderContainer = styled(Stack)({
+  height: "60px",
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+})
+
+const LogoImage = styled("img")({
+  width: "150px",
+  cursor: "pointer",
+})
+
+const AuthButton = styled(Button)({
+  background: COLORS.primary,
+  "&:hover": {
+    background: COLORS.primaryHover,
+  },
+})
 
 export default Header

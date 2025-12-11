@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useCallback } from "react"
 import {
   Box,
   Modal,
@@ -10,11 +10,24 @@ import {
   Fade,
 } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
+
 import CardTrailer from "./CardTrailer"
+import { COLORS, Z_INDEX } from "../Utils/constants"
 
 const ModalExploreAll = ({ open, onClose, category }) => {
   const [hoveredMovieId, setHoveredMovieId] = useState(null)
   const containerRef = useRef(null)
+
+  const handleHoverChange = useCallback(
+    (movieId, isHovered) => {
+      if (isHovered) {
+        setHoveredMovieId(movieId)
+      } else if (hoveredMovieId === movieId) {
+        setHoveredMovieId(null)
+      }
+    },
+    [hoveredMovieId]
+  )
 
   if (!category) return null
 
@@ -27,55 +40,31 @@ const ModalExploreAll = ({ open, onClose, category }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 1300,
+        zIndex: Z_INDEX.modal,
       }}
       slotProps={{
         backdrop: {
           timeout: 400,
-          sx: {
-            backgroundColor: "rgba(0, 0, 0, 0.85)",
-          },
+          sx: { backgroundColor: COLORS.overlay },
         },
       }}
     >
       <Fade in={open} timeout={400}>
         <ModalContainer ref={containerRef}>
           {/* Header */}
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
-              padding: "20px 30px",
-              borderBottom: "1px solid rgba(255,255,255,0.1)",
-              position: "sticky",
-              top: 0,
-              backgroundColor: "#181818",
-              zIndex: 10,
-            }}
-          >
-            <Typography
-              variant="h4"
-              sx={{
-                color: "white",
-                fontWeight: "bold",
-              }}
-            >
-              {category.name}
-            </Typography>
-            <IconButton
-              onClick={onClose}
-              sx={{
-                color: "white",
-                backgroundColor: "rgba(255,255,255,0.1)",
-                "&:hover": {
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                },
-              }}
-            >
+          <ModalHeader>
+            <Stack flexDirection="row" gap="15px" alignItems="flex-end">
+              <Typography variant="h4" fontWeight="bold" color={COLORS.text} lineHeight="33px">
+                {category.name} 
+              </Typography>
+              <Typography color={COLORS.textSecondary} fontSize="14px">
+                {category.movies.length} titles found
+              </Typography>
+            </Stack>
+            <CloseButton onClick={onClose} aria-label="Close modal">
               <CloseIcon />
-            </IconButton>
-          </Stack>
+            </CloseButton>
+          </ModalHeader>
 
           {/* Movie Grid */}
           <Box sx={{ padding: "30px", paddingBottom: "100px" }}>
@@ -99,79 +88,75 @@ const ModalExploreAll = ({ open, onClose, category }) => {
                     randomShowLogo={movie.vote_average > 7}
                     index={index}
                     containerRef={containerRef}
-                    onHoverChange={(isHovered) => {
-                      if (isHovered) {
-                        setHoveredMovieId(movie.id)
-                      } else {
-                        if (hoveredMovieId === movie.id) {
-                          setHoveredMovieId(null)
-                        }
-                      }
-                    }}
+                    onHoverChange={(isHovered) =>
+                      handleHoverChange(movie.id, isHovered)
+                    }
                   />
                 </Grid>
               ))}
             </Grid>
           </Box>
 
-          {/* Footer */}
-          <Stack
-            sx={{
-              padding: "20px 30px",
-              borderTop: "1px solid rgba(255,255,255,0.1)",
-              position: "sticky",
-              bottom: 0,
-              backgroundColor: "#181818",
-            }}
-          >
-            <Typography sx={{ color: "#a3a3a3", fontSize: "14px" }}>
-              {category.movies.length} titles
-            </Typography>
-          </Stack>
         </ModalContainer>
       </Fade>
     </Modal>
   )
 }
 
-const ModalContainer = styled(Box)`
-  width: 90%;
-  max-width: 1200px;
-  max-height: 85vh;
-  background-color: #181818;
-  border-radius: 12px;
-  overflow-y: auto;
-  outline: none;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+// Styled Components
+const ModalContainer = styled(Box)({
+  width: "90%",
+  maxWidth: "1200px",
+  maxHeight: "85vh",
+  backgroundColor: COLORS.backgroundCard,
+  borderRadius: "12px",
+  overflowY: "auto",
+  outline: "none",
+  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.6)",
+  animation: "scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+  "@keyframes scaleIn": {
+    "0%": {
+      transform: "scale(0.7)",
+      opacity: 0,
+    },
+    "100%": {
+      transform: "scale(1)",
+      opacity: 1,
+    },
+  },
+  "&::-webkit-scrollbar": {
+    width: "8px",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: COLORS.backgroundCard,
+  },
+  "&::-webkit-scrollbar-thumb": {
+    background: "#555",
+    borderRadius: "4px",
+  },
+  "&::-webkit-scrollbar-thumb:hover": {
+    background: "#777",
+  },
+})
 
-  /* Scale animation */
-  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+const ModalHeader = styled(Stack)({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "20px 30px",
+  borderBottom: `1px solid ${COLORS.border}`,
+  position: "sticky",
+  top: 0,
+  backgroundColor: COLORS.backgroundCard,
+  zIndex: 10,
+})
 
-  @keyframes scaleIn {
-    0% {
-      transform: scale(0.7);
-      opacity: 0;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  /* Custom scrollbar */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-track {
-    background: #181818;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #777;
-  }
-`
+const CloseButton = styled(IconButton)({
+  color: COLORS.text,
+  backgroundColor: "rgba(255, 255, 255, 0.1)",
+  "&:hover": {
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+  },
+})
 
 export default ModalExploreAll

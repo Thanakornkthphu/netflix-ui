@@ -1,10 +1,15 @@
-import { Card, CardContent, Stack, styled, Typography } from "@mui/material"
 import React, { useRef, useState, useEffect, useCallback } from "react"
-import { ReactComponent as NetflixLogo } from "../Assets/netflixIcon.svg"
-import ModalCardTrailer from "./ModalCardTrailer"
-import MiniPlayer from "./MiniPlayer"
+import { Stack } from "@mui/material"
 
-const EDGE_MARGIN = 50 // ระยะห่างจากขอบจอ
+import MiniPlayer from "./MiniPlayer"
+import {
+  EDGE_MARGIN,
+  MINI_PLAYER_WIDTH,
+  getPosterUrl,
+} from "../Utils/constants"
+import { ReactComponent as NetflixLogo } from "../Assets/netflixIcon.svg"
+
+const HOVER_DELAY = 700
 
 const CardTrailer = ({
   movie,
@@ -13,107 +18,105 @@ const CardTrailer = ({
   onHoverChange,
   containerRef,
 }) => {
-  const [isHoverCardTrailer, setIsHoverCardTrailer] = useState(false)
-  const [openModal, setOpenModal] = useState(false)
-  const [edgePosition, setEdgePosition] = useState("center") // "left" | "center" | "right"
-  const [positionOffset, setPositionOffset] = useState(0) 
-
+  const [isHovered, setIsHovered] = useState(false)
+  const [edgePosition, setEdgePosition] = useState("center")
+  const [positionOffset, setPositionOffset] = useState(0)
   const [isImageLoaded, setIsImageLoaded] = useState(false)
+
   const hoverTimerRef = useRef(null)
   const isMountedRef = useRef(true)
   const movieIdRef = useRef(movie.id)
   const cardRef = useRef(null)
 
+  // Reset state when movie changes
   useEffect(() => {
     const previousMovieId = movieIdRef.current
     movieIdRef.current = movie.id
 
     if (previousMovieId !== movie.id) {
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current)
-        hoverTimerRef.current = null
-      }
-      if (isHoverCardTrailer) {
-        setIsHoverCardTrailer(false)
+      clearHoverTimer()
+      if (isHovered) {
+        setIsHovered(false)
         onHoverChange?.(false)
       }
     }
-  }, [movie.id, isHoverCardTrailer, onHoverChange])
+  }, [movie.id, isHovered, onHoverChange])
 
+  // Cleanup on unmount
   useEffect(() => {
     isMountedRef.current = true
     return () => {
       isMountedRef.current = false
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current)
-        hoverTimerRef.current = null
-      }
+      clearHoverTimer()
     }
   }, [])
 
-  const handleMouseEnter = useCallback(() => {
+  const clearHoverTimer = () => {
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current)
       hoverTimerRef.current = null
     }
+  }
+
+  const calculatePosition = useCallback(() => {
+    if (!cardRef.current) return
+
+    const rect = cardRef.current.getBoundingClientRect()
+
+    // Get container bounds (modal or screen)
+    let containerLeft = 0
+    let containerRight = window.innerWidth
+
+    if (containerRef?.current) {
+      const containerRect = containerRef.current.getBoundingClientRect()
+      containerLeft = containerRect.left
+      containerRight = containerRect.right
+    }
+
+    // Calculate MiniPlayer position
+    const cardCenter = rect.left + rect.width / 2
+    const miniPlayerLeft = cardCenter - MINI_PLAYER_WIDTH / 2
+    const miniPlayerRight = cardCenter + MINI_PLAYER_WIDTH / 2
+
+    // Determine edge position and offset
+    if (miniPlayerLeft < containerLeft + EDGE_MARGIN) {
+      setEdgePosition("left")
+      setPositionOffset(containerLeft + EDGE_MARGIN - rect.left)
+    } else if (miniPlayerRight > containerRight - EDGE_MARGIN) {
+      setEdgePosition("right")
+      setPositionOffset(EDGE_MARGIN - (containerRight - rect.right))
+    } else {
+      setEdgePosition("center")
+      setPositionOffset(0)
+    }
+  }, [containerRef])
+
+  const handleMouseEnter = useCallback(() => {
+    clearHoverTimer()
 
     const currentMovieId = movieIdRef.current
     hoverTimerRef.current = setTimeout(() => {
       if (isMountedRef.current && movieIdRef.current === currentMovieId) {
-        // คำนวณตำแหน่งจริงบนหน้าจอ
-        if (cardRef.current) {
-          const rect = cardRef.current.getBoundingClientRect()
-          const miniPlayerWidth = 370
-
-          // ถ้ามี containerRef ให้คำนวณเทียบกับ container (เช่น Modal)
-          // ถ้าไม่มีให้คำนวณเทียบกับหน้าจอ
-          let containerLeft = 0
-          let containerRight = window.innerWidth
-
-          if (containerRef?.current) {
-            const containerRect = containerRef.current.getBoundingClientRect()
-            containerLeft = containerRect.left
-            containerRight = containerRect.right
-          }
-
-          const containerWidth = containerRight - containerLeft
-
-          // คำนวณว่า MiniPlayer จะอยู่ที่ไหนถ้าอยู่กึ่งกลางการ์ด
-          const cardCenter = rect.left + rect.width / 2
-          const miniPlayerLeft = cardCenter - miniPlayerWidth / 2
-          const miniPlayerRight = cardCenter + miniPlayerWidth / 2
-
-          // ถ้า MiniPlayer จะล้นซ้าย (เทียบกับ container)
-          if (miniPlayerLeft < containerLeft + EDGE_MARGIN) {
-            setEdgePosition("left")
-            // คำนวณ offset เพื่อให้ห่างจากขอบซ้าย container EDGE_MARGIN px
-            setPositionOffset(containerLeft + EDGE_MARGIN - rect.left)
-          }
-          // ถ้า MiniPlayer จะล้นขวา (เทียบกับ container)
-          else if (miniPlayerRight > containerRight - EDGE_MARGIN) {
-            setEdgePosition("right")
-            // คำนวณ offset เพื่อให้ห่างจากขอบขวา container EDGE_MARGIN px
-            setPositionOffset(EDGE_MARGIN - (containerRight - rect.right))
-          } else {
-            setEdgePosition("center")
-            setPositionOffset(0)
-          }
-        }
-
-        setIsHoverCardTrailer(true)
+        calculatePosition()
+        setIsHovered(true)
         onHoverChange?.(true)
       }
-    }, 700)
-  }, [onHoverChange, containerRef])
+    }, HOVER_DELAY)
+  }, [onHoverChange, calculatePosition])
 
   const handleMouseLeave = useCallback(() => {
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
-      hoverTimerRef.current = null
-    }
-    setIsHoverCardTrailer(false)
+    clearHoverTimer()
+    setIsHovered(false)
     onHoverChange?.(false)
   }, [onHoverChange])
+
+  const handleHoverChange = useCallback(
+    (value) => {
+      setIsHovered(value)
+      onHoverChange?.(value)
+    },
+    [onHoverChange]
+  )
 
   return (
     <Stack
@@ -127,23 +130,23 @@ const CardTrailer = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* Card Poster */}
       <Stack
         sx={{
           position: "relative",
-          zIndex: isHoverCardTrailer ? -1 : 1,
+          zIndex: isHovered ? -1 : 1,
           width: "auto",
           height: "100%",
           borderRadius: "10px",
           maxWidth: "400px",
           cursor: "pointer",
           transition: "transform 0.3s ease-in-out, opacity 0.3s ease-in-out",
-          opacity: isHoverCardTrailer ? 0 : 1,
-          visibility: isHoverCardTrailer ? "hidden" : "visible",
+          opacity: isHovered ? 0 : 1,
+          visibility: isHovered ? "hidden" : "visible",
           "&:hover": {
             transform: "scale(1.08)",
           },
         }}
-        onClick={() => setOpenModal(true)}
       >
         {randomShowLogo && isImageLoaded && (
           <NetflixLogo
@@ -151,35 +154,29 @@ const CardTrailer = ({
               position: "absolute",
               top: "15px",
               left: "10px",
-              objectFit: "cover",
               width: "30px",
               height: "30px",
             }}
           />
         )}
         <img
-          src={"https://image.tmdb.org/t/p/w500" + movie.poster_path}
-          alt={movie.title}
+          src={getPosterUrl(movie.poster_path)}
+          alt={movie.title || movie.original_name}
           style={{ borderRadius: "7px", maxWidth: "500px" }}
           onLoad={() => setIsImageLoaded(true)}
         />
       </Stack>
 
-      {/* MiniPlayer - แสดงทับ CardTrailer เมื่อ hover */}
-      {isHoverCardTrailer && (
+      {/* MiniPlayer on Hover */}
+      {isHovered && (
         <MiniPlayer
-          isHoverCardTrailer={isHoverCardTrailer}
-          setIsHoverCardTrailer={(value) => {
-            setIsHoverCardTrailer(value)
-            onHoverChange?.(value)
-          }}
           movie={movie}
+          isVisible={isHovered}
+          onHoverChange={handleHoverChange}
           edgePosition={edgePosition}
           positionOffset={positionOffset}
         />
       )}
-
-      <ModalCardTrailer open={openModal} onClose={() => setOpenModal(false)} />
     </Stack>
   )
 }
