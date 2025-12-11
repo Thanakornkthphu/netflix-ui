@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import CardTrailer from "./CardTrailer"
-import { Stack, Typography, IconButton } from "@mui/material"
+import { Stack, Typography, IconButton, Box } from "@mui/material"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation } from "swiper/modules"
 import "swiper/css"
@@ -8,12 +8,26 @@ import "swiper/css/navigation"
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import SliderSkeleton from "./SliderSkeleton"
+import ModalExploreAll from "./ModalExploreAll"
 
 const Slider = ({ movies, isLoading }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null)
   const [hoveredMovieId, setHoveredMovieId] = useState(null)
+  const [hoveredCategoryIndex, setHoveredCategoryIndex] = useState(null)
+  const [exploreModalOpen, setExploreModalOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState(null)
 
   const [sliderStates, setSliderStates] = useState({})
+
+  const handleOpenExploreModal = (category) => {
+    setSelectedCategory(category)
+    setExploreModalOpen(true)
+  }
+
+  const handleCloseExploreModal = () => {
+    setExploreModalOpen(false)
+    setSelectedCategory(null)
+  }
 
   const handleUpdateState = (index, swiper) => {
     setSliderStates((prev) => ({
@@ -45,14 +59,82 @@ const Slider = ({ movies, isLoading }) => {
 
         return (
           <Stack key={index} sx={{ padding: "0px 20px" }}>
-            <Typography
+            <Stack
+              direction="row"
+              alignItems="center"
+              gap="15px"
               mt="40px"
               mb="5px"
               ml="20px"
-              sx={{ color: "white", fontSize: "32px", fontWeight: "bold" }}
+              onMouseEnter={() => setHoveredCategoryIndex(index)}
+              onMouseLeave={() => setHoveredCategoryIndex(null)}
+              onClick={() =>
+                movie.movies.length > 7 && handleOpenExploreModal(movie)
+              }
+              sx={{
+                cursor: movie.movies.length > 7 ? "pointer" : "default",
+                width: "fit-content",
+              }}
             >
-              {movie.name}
-            </Typography>
+              <Typography
+                sx={{
+                  color: "white",
+                  fontSize: "32px",
+                  fontWeight: "bold",
+                  transition: "color 0.2s ease",
+                  "&:hover":
+                    movie.movies.length > 7
+                      ? {
+                          color: "#e5e5e5",
+                        }
+                      : {},
+                }}
+              >
+                {movie.name}
+              </Typography>
+
+              {/* Explore All - แสดงเมื่อ hover และมีหนังมากกว่า 7 */}
+              {movie.movies.length > 7 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    opacity: hoveredCategoryIndex === index ? 1 : 0,
+                    transform:
+                      hoveredCategoryIndex === index
+                        ? "translateX(0)"
+                        : "translateX(-10px)",
+                    transition: "opacity 0.3s ease, transform 0.3s ease",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: "#54b9c5",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    Explore All
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: "#54b9c5",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      transform:
+                        hoveredCategoryIndex === index
+                          ? "translateX(5px)"
+                          : "translateX(0)",
+                      transition: "transform 0.3s ease",
+                    }}
+                  >
+                    ›
+                  </Typography>
+                </Box>
+              )}
+            </Stack>
 
             <Stack
               direction="row"
@@ -102,39 +184,40 @@ const Slider = ({ movies, isLoading }) => {
                   overflow: "visible",
                 }}
               >
-                {movie && movie.movies.map((m, i) => (
-                  <SwiperSlide
-                    key={m.id || i}
-                    style={{
-                      zIndex: hoveredMovieId === m.id ? 100 : 1,
-                      overflow: "visible",
-                    }}
-                  >
-                    <CardTrailer
-                      movie={m}
-                      randomShowLogo={m.vote_average > 7}
-                      index={i}
-                      totalCards={movie.movies.length}
-                      onHoverChange={(isHovered) => {
-                        if (isHovered) {
-                          // Immediately reset previous hovered card when hovering new card
-                          if (
-                            hoveredMovieId !== null &&
-                            hoveredMovieId !== m.id
-                          ) {
-                            setHoveredMovieId(null)
-                          }
-                          setHoveredMovieId(m.id)
-                        } else {
-                          // Only reset if this is the currently hovered card
-                          if (hoveredMovieId === m.id) {
-                            setHoveredMovieId(null)
-                          }
-                        }
+                {movie &&
+                  movie.movies.map((m, i) => (
+                    <SwiperSlide
+                      key={m.id || i}
+                      style={{
+                        zIndex: hoveredMovieId === m.id ? 100 : 1,
+                        overflow: "visible",
                       }}
-                    />
-                  </SwiperSlide>
-                ))}
+                    >
+                      <CardTrailer
+                        movie={m}
+                        randomShowLogo={m.vote_average > 7}
+                        index={i}
+                        totalCards={movie.movies.length}
+                        onHoverChange={(isHovered) => {
+                          if (isHovered) {
+                            // Immediately reset previous hovered card when hovering new card
+                            if (
+                              hoveredMovieId !== null &&
+                              hoveredMovieId !== m.id
+                            ) {
+                              setHoveredMovieId(null)
+                            }
+                            setHoveredMovieId(m.id)
+                          } else {
+                            // Only reset if this is the currently hovered card
+                            if (hoveredMovieId === m.id) {
+                              setHoveredMovieId(null)
+                            }
+                          }
+                        }}
+                      />
+                    </SwiperSlide>
+                  ))}
               </Swiper>
 
               <IconButton
@@ -157,6 +240,13 @@ const Slider = ({ movies, isLoading }) => {
           </Stack>
         )
       })}
+
+      {/* Modal Explore All */}
+      <ModalExploreAll
+        open={exploreModalOpen}
+        onClose={handleCloseExploreModal}
+        category={selectedCategory}
+      />
     </div>
   )
 }

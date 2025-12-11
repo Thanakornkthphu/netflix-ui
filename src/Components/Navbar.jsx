@@ -35,11 +35,6 @@ const Navbar = () => {
         >
             <Stack flexDirection={'row'} alignItems={'center'} gap={'30px'}>
                 <img src={Logo} alt="Netflix Logo" style={{ width: "150px" }}/>
-                {menu.map((item, index) => (
-                    <Typography key={index} sx={{ cursor: 'pointer' }} onClick={() => navigate(`/${item.toLowerCase().replace(' ', '-')}`)}>
-                        {item}
-                    </Typography>
-                ))}
             </Stack>
             <Stack>
                 <FaPowerOff onClick={onSubmitSignOut} style={{ cursor: 'pointer' }}/>
