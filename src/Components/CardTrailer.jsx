@@ -6,11 +6,17 @@ import MiniPlayer from "./MiniPlayer"
 
 const EDGE_MARGIN = 50 // ระยะห่างจากขอบจอ
 
-const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
+const CardTrailer = ({
+  movie,
+  randomShowLogo,
+  index,
+  onHoverChange,
+  containerRef,
+}) => {
   const [isHoverCardTrailer, setIsHoverCardTrailer] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [edgePosition, setEdgePosition] = useState("center") // "left" | "center" | "right"
-  const [positionOffset, setPositionOffset] = useState(0) // offset สำหรับปรับตำแหน่ง
+  const [positionOffset, setPositionOffset] = useState(0) 
 
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const hoverTimerRef = useRef(null)
@@ -57,25 +63,37 @@ const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
         // คำนวณตำแหน่งจริงบนหน้าจอ
         if (cardRef.current) {
           const rect = cardRef.current.getBoundingClientRect()
-          const screenWidth = window.innerWidth
           const miniPlayerWidth = 370
+
+          // ถ้ามี containerRef ให้คำนวณเทียบกับ container (เช่น Modal)
+          // ถ้าไม่มีให้คำนวณเทียบกับหน้าจอ
+          let containerLeft = 0
+          let containerRight = window.innerWidth
+
+          if (containerRef?.current) {
+            const containerRect = containerRef.current.getBoundingClientRect()
+            containerLeft = containerRect.left
+            containerRight = containerRect.right
+          }
+
+          const containerWidth = containerRight - containerLeft
 
           // คำนวณว่า MiniPlayer จะอยู่ที่ไหนถ้าอยู่กึ่งกลางการ์ด
           const cardCenter = rect.left + rect.width / 2
           const miniPlayerLeft = cardCenter - miniPlayerWidth / 2
           const miniPlayerRight = cardCenter + miniPlayerWidth / 2
 
-          // ถ้า MiniPlayer จะล้นซ้าย
-          if (miniPlayerLeft < EDGE_MARGIN) {
+          // ถ้า MiniPlayer จะล้นซ้าย (เทียบกับ container)
+          if (miniPlayerLeft < containerLeft + EDGE_MARGIN) {
             setEdgePosition("left")
-            // คำนวณ offset เพื่อให้ห่างจากขอบซ้าย EDGE_MARGIN px
-            setPositionOffset(EDGE_MARGIN - rect.left)
+            // คำนวณ offset เพื่อให้ห่างจากขอบซ้าย container EDGE_MARGIN px
+            setPositionOffset(containerLeft + EDGE_MARGIN - rect.left)
           }
-          // ถ้า MiniPlayer จะล้นขวา
-          else if (miniPlayerRight > screenWidth - EDGE_MARGIN) {
+          // ถ้า MiniPlayer จะล้นขวา (เทียบกับ container)
+          else if (miniPlayerRight > containerRight - EDGE_MARGIN) {
             setEdgePosition("right")
-            // คำนวณ offset เพื่อให้ห่างจากขอบขวา EDGE_MARGIN px
-            setPositionOffset(EDGE_MARGIN - (screenWidth - rect.right))
+            // คำนวณ offset เพื่อให้ห่างจากขอบขวา container EDGE_MARGIN px
+            setPositionOffset(EDGE_MARGIN - (containerRight - rect.right))
           } else {
             setEdgePosition("center")
             setPositionOffset(0)
@@ -86,7 +104,7 @@ const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
         onHoverChange?.(true)
       }
     }, 700)
-  }, [onHoverChange])
+  }, [onHoverChange, containerRef])
 
   const handleMouseLeave = useCallback(() => {
     if (hoverTimerRef.current) {
@@ -109,7 +127,6 @@ const CardTrailer = ({ movie, randomShowLogo, index, onHoverChange }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* CardTrailer - ยังคงแสดงอยู่เสมอเพื่อเป็น placeholder */}
       <Stack
         sx={{
           position: "relative",

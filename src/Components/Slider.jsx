@@ -61,11 +61,10 @@ const Slider = ({ movies, isLoading }) => {
           <Stack key={index} sx={{ padding: "0px 20px" }}>
             <Stack
               direction="row"
-              alignItems="center"
+              alignItems="flex-end"
               gap="15px"
               mt="40px"
               mb="5px"
-              ml="20px"
               onMouseEnter={() => setHoveredCategoryIndex(index)}
               onMouseLeave={() => setHoveredCategoryIndex(null)}
               onClick={() =>
@@ -82,6 +81,7 @@ const Slider = ({ movies, isLoading }) => {
                   fontSize: "32px",
                   fontWeight: "bold",
                   transition: "color 0.2s ease",
+                  lineHeight: "37px",
                   "&:hover":
                     movie.movies.length > 7
                       ? {
@@ -93,13 +93,11 @@ const Slider = ({ movies, isLoading }) => {
                 {movie.name}
               </Typography>
 
-              {/* Explore All - แสดงเมื่อ hover และมีหนังมากกว่า 7 */}
               {movie.movies.length > 7 && (
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "5px",
                     opacity: hoveredCategoryIndex === index ? 1 : 0,
                     transform:
                       hoveredCategoryIndex === index
@@ -130,7 +128,7 @@ const Slider = ({ movies, isLoading }) => {
                       transition: "transform 0.3s ease",
                     }}
                   >
-                    ›
+                    ››
                   </Typography>
                 </Box>
               )}

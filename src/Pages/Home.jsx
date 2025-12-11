@@ -44,6 +44,8 @@ const Home = () => {
 
   return (
     <>
+      <Navbar />
+
       <Stack
         sx={{
           width: "100vw",
@@ -58,72 +60,70 @@ const Home = () => {
           overflowX: "hidden",
         }}
       >
-        <Stack sx={{ padding: "30px 60px" }}>
-          <Navbar />
-          <Stack sx={{ position: "absolute", top: "1.5rem" }}>
-            <Box>
-              <img src={title} alt={title} style={{ width: "700px" }} />
+        <Stack sx={{ padding: "100px 60px 30px 60px" }}>
+          <Box sx={{ marginTop: "-100px" }}>
+            <img src={title} alt={title} style={{ width: "700px" }} />
 
-              <Stack
-                sx={{
-                  marginTop: "20px",
-                  flexDirection: "row",
-                  gap: "15px",
-                  alignItems: "center",
+            <Stack
+              sx={{
+                marginTop: "20px",
+                flexDirection: "row",
+                gap: "15px",
+                alignItems: "center",
+              }}
+            >
+              <Top10Icon style={{ width: "50px", maxWidth: "50px" }} />
+              <Typography
+                style={{
+                  fontSize: "1.6rem",
+                  fontWeight: "600",
+                  textTransform: "capitalize",
+                  color: "white",
                 }}
               >
-                <Top10Icon style={{ width: "50px", maxWidth: "50px" }} />
-                <Typography
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: "600",
-                    textTransform: "capitalize",
-                    color: "white",
-                  }}
-                >
-                  No.2 in Films Today
-                </Typography>
-              </Stack>
+                No.2 in Films Today
+              </Typography>
+            </Stack>
 
-              <Stack mt="20px" sx={{ width: "auto", maxWidth: "700px" }}>
-                <Typography
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: "400",
-                    textTransform: "capitalize",
-                    color: "white",
-                  }}
-                >
-                  Kids in 1980s Hawkins face secret experiments, supernatural
-                  forces, and a mysterious girl named Eleven.
-                </Typography>
-              </Stack>
-            </Box>
-            <Box mt="50px" sx={{ position: "relative" }}>
-              <ButtonStyled
-                sx={{ marginRight: "25px" }}
-                onClick={() =>
-                  navigate(`${pages.player.replace(":id", "123123")}`)
-                }
+            <Stack mt="20px" sx={{ width: "auto", maxWidth: "700px" }}>
+              <Typography
+                style={{
+                  fontSize: "1.6rem",
+                  fontWeight: "400",
+                  textTransform: "capitalize",
+                  color: "white",
+                }}
               >
-                <FaPlay style={{ marginRight: "10px", fontSize: "1.6rem" }} />
-                <Typography
-                  style={{
-                    fontSize: "1.6rem",
-                    fontWeight: "500",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  Play
-                </Typography>
-              </ButtonStyled>
-            </Box>
-          </Stack>
+                Kids in 1980s Hawkins face secret experiments, supernatural
+                forces, and a mysterious girl named Eleven.
+              </Typography>
+            </Stack>
+          </Box>
+
+          <Box mt="50px" sx={{ position: "relative" }}>
+            <ButtonStyled
+              onClick={() =>
+                navigate(`${pages.player.replace(":id", "123123")}`)
+              }
+            >
+              <FaPlay style={{ marginRight: "10px", fontSize: "1.6rem" }} />
+              <Typography
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  textTransform: "capitalize",
+                }}
+              >
+                Play
+              </Typography>
+            </ButtonStyled>
+          </Box>
         </Stack>
       </Stack>
-      <Stack sx={{ marginTop: '-100px' }}>
+
+      <Box sx={{ marginTop: "-100px" }}>
         <Slider movies={dataMovies} isLoading={isLoading} />
-      </Stack>
+      </Box>
       <Footer />
     </>
   )
@@ -134,7 +134,8 @@ const ButtonStyled = styled(Button)`
   color: black;
   font-weight: 600;
   padding: 7px 30px;
-  height: 55px;
+  height: 45px;
+  margin-right: 25px;
 
   :hover {
     background: #d3d3d3;

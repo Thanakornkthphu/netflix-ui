@@ -22,7 +22,6 @@ const ModalCardTrailer = ({ open, onClose }) => {
               borderRadius: 2,
               boxShadow: 24,
               outline: "none",
-              position: 'relative'
             }}
           >
             <CardContent>

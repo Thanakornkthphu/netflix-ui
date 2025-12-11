@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import {
   Box,
   Modal,
@@ -14,6 +14,7 @@ import CardTrailer from "./CardTrailer"
 
 const ModalExploreAll = ({ open, onClose, category }) => {
   const [hoveredMovieId, setHoveredMovieId] = useState(null)
+  const containerRef = useRef(null)
 
   if (!category) return null
 
@@ -38,7 +39,7 @@ const ModalExploreAll = ({ open, onClose, category }) => {
       }}
     >
       <Fade in={open} timeout={400}>
-        <ModalContainer>
+        <ModalContainer ref={containerRef}>
           {/* Header */}
           <Stack
             direction="row"
@@ -97,6 +98,7 @@ const ModalExploreAll = ({ open, onClose, category }) => {
                     movie={movie}
                     randomShowLogo={movie.vote_average > 7}
                     index={index}
+                    containerRef={containerRef}
                     onHoverChange={(isHovered) => {
                       if (isHovered) {
                         setHoveredMovieId(movie.id)
