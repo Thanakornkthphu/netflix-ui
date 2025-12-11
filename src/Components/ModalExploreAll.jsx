@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   Box,
   Modal,
@@ -10,8 +10,11 @@ import {
   Fade,
 } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
+import CardTrailer from "./CardTrailer"
 
 const ModalExploreAll = ({ open, onClose, category }) => {
+  const [hoveredMovieId, setHoveredMovieId] = useState(null)
+
   if (!category) return null
 
   return (
@@ -74,61 +77,36 @@ const ModalExploreAll = ({ open, onClose, category }) => {
           </Stack>
 
           {/* Movie Grid */}
-          <Box sx={{ padding: "30px" }}>
-            <Grid container spacing={2}>
-              {category.movies.map((movie) => (
-                <Grid item xs={6} sm={4} md={3} lg={2} key={movie.id}>
-                  <MovieCard>
-                    <img
-                      src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-                      alt={movie.title || movie.original_name}
-                      style={{
-                        width: "100%",
-                        borderRadius: "8px",
-                        aspectRatio: "2/3",
-                        objectFit: "cover",
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        color: "white",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        marginTop: "8px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {movie.title || movie.original_name}
-                    </Typography>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      gap="5px"
-                      mt="4px"
-                    >
-                      <Typography
-                        sx={{
-                          color: "#46d369",
-                          fontSize: "12px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        ⭐ {movie.vote_average?.toFixed(1)}
-                      </Typography>
-                      {movie.release_date && (
-                        <Typography
-                          sx={{
-                            color: "#a3a3a3",
-                            fontSize: "12px",
-                          }}
-                        >
-                          • {new Date(movie.release_date).getFullYear()}
-                        </Typography>
-                      )}
-                    </Stack>
-                  </MovieCard>
+          <Box sx={{ padding: "30px", paddingBottom: "100px" }}>
+            <Grid container spacing={3}>
+              {category.movies.map((movie, index) => (
+                <Grid
+                  item
+                  xs={6}
+                  sm={4}
+                  md={3}
+                  lg={2}
+                  key={movie.id}
+                  sx={{
+                    position: "relative",
+                    zIndex: hoveredMovieId === movie.id ? 100 : 1,
+                    overflow: "visible",
+                  }}
+                >
+                  <CardTrailer
+                    movie={movie}
+                    randomShowLogo={movie.vote_average > 7}
+                    index={index}
+                    onHoverChange={(isHovered) => {
+                      if (isHovered) {
+                        setHoveredMovieId(movie.id)
+                      } else {
+                        if (hoveredMovieId === movie.id) {
+                          setHoveredMovieId(null)
+                        }
+                      }
+                    }}
+                  />
                 </Grid>
               ))}
             </Grid>
@@ -191,19 +169,6 @@ const ModalContainer = styled(Box)`
   }
   &::-webkit-scrollbar-thumb:hover {
     background: #777;
-  }
-`
-
-const MovieCard = styled(Box)`
-  cursor: pointer;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-
-  &:hover img {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   }
 `
 
