@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react"
-import { Stack } from "@mui/material"
+import { Stack, useTheme, useMediaQuery } from "@mui/material"
 
 import MiniPlayer from "./MiniPlayer"
 import {
@@ -30,6 +30,10 @@ const CardTrailer = ({
   const movieIdRef = useRef(movie.id)
   const cardRef = useRef(null)
   const navigate = useNavigate()
+
+  // Detect mobile
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
   // Reset state when movie changes
   useEffect(() => {
     const previousMovieId = movieIdRef.current
@@ -112,6 +116,46 @@ const CardTrailer = ({
     onHoverChange?.(false)
   }, [onHoverChange])
 
+  // Handle tap for mobile
+  const handleTap = useCallback(() => {
+    if (!isMobile) return
+    
+    calculatePosition()
+    setIsHovered(true)
+    onHoverChange?.(true)
+  }, [
+    isMobile,
+    isHovered,
+    navigate,
+    movie.id,
+    calculatePosition,
+    onHoverChange,
+  ])
+
+  // Close MiniPlayer when clicking outside (mobile)
+  useEffect(() => {
+    if (!isMobile || !isHovered) return
+
+    const handleClickOutside = (event) => {
+      if (cardRef.current && !cardRef.current.contains(event.target)) {
+        setIsHovered(false)
+        onHoverChange?.(false)
+      }
+    }
+
+    // Add slight delay to prevent immediate close
+    const timer = setTimeout(() => {
+      document.addEventListener("touchstart", handleClickOutside)
+      document.addEventListener("click", handleClickOutside)
+    }, 100)
+
+    return () => {
+      clearTimeout(timer)
+      document.removeEventListener("touchstart", handleClickOutside)
+      document.removeEventListener("click", handleClickOutside)
+    }
+  }, [isMobile, isHovered, onHoverChange])
+
   const handleHoverChange = useCallback(
     (value) => {
       setIsHovered(value)
@@ -129,12 +173,19 @@ const CardTrailer = ({
         height: "100%",
         maxWidth: "400px",
       }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      // Desktop: use hover events
+      onMouseEnter={!isMobile ? handleMouseEnter : undefined}
+      onMouseLeave={!isMobile ? handleMouseLeave : undefined}
+      // Mobile: use tap event
+      onClick={isMobile ? handleTap : undefined}
     >
       {/* Card Poster */}
       <Stack
-        onClick={() => navigate(pages.player.replace(":id", movie.id))}
+        onClick={
+          !isMobile
+            ? () => navigate(pages.player.replace(":id", movie.id))
+            : undefined
+        }
         sx={{
           position: "relative",
           zIndex: isHovered ? -1 : 1,
