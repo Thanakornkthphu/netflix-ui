@@ -60,23 +60,28 @@ const Header = () => {
 }
 
 // Styled Components
-const HeaderContainer = styled(Stack)({
-  height: "60px",
+const HeaderContainer = styled(Stack)(({ theme }) => ({
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-})
+  height: "50px",
+  [theme.breakpoints.up("sm")]: { height: "55px" },
+  [theme.breakpoints.up("md")]: { height: "60px" },
+}))
 
-const LogoImage = styled("img")({
-  width: "150px",
+const LogoImage = styled("img")(({ theme }) => ({
   cursor: "pointer",
-})
+  width: "80px",
+  [theme.breakpoints.up("sm")]: { width: "120px" },
+  [theme.breakpoints.up("md")]: { width: "150px" },
+}))
 
-const AuthButton = styled(Button)({
+const AuthButton = styled(Button)(({ theme }) => ({
   background: COLORS.primary,
-  "&:hover": {
-    background: COLORS.primaryHover,
-  },
-})
+  "&:hover": { background: COLORS.primaryHover },
+  padding: "6px 12px",
+  fontSize: "12px",
+  [theme.breakpoints.up("sm")]: { padding: "6px 16px", fontSize: "14px" },
+}))
 
 export default Header

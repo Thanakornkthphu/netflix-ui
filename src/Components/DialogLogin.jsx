@@ -81,7 +81,9 @@ const DialogLogin = () => {
           />
         </DialogContentText>
 
-        <DialogContentText sx={{ marginTop: "20px" }}>
+        <DialogContentText
+          sx={{ marginTop: { xs: "12px", sm: "16px", md: "20px" } }}
+        >
           <StyledInput
             placeholder="Password"
             name="password"
@@ -129,30 +131,41 @@ const DialogLogin = () => {
   )
 }
 
-// Styles
+// Responsive styles using sx prop
+const responsivePadding = { xs: "0 24px", sm: "0 48px", md: "0 68px" }
 const styles = {
   title: {
     color: COLORS.text,
-    padding: "30px 68px",
+    padding: { xs: "20px 24px", sm: "24px 48px", md: "30px 68px" },
     fontWeight: 800,
-    fontSize: "2rem",
+    fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2rem" },
   },
   content: {
-    padding: "0 68px",
+    padding: responsivePadding,
   },
   actions: {
     justifyContent: "center",
-    padding: "20px 68px",
+    padding: { xs: "16px 24px", sm: "18px 48px", md: "20px 68px" },
   },
   linkActions: {
     justifyContent: "center",
-    padding: "15px 68px 30px",
+    padding: {
+      xs: "12px 24px 24px",
+      sm: "14px 48px 28px",
+      md: "15px 68px 30px",
+    },
     color: COLORS.text,
   },
   signupActions: {
     justifyContent: "flex-start",
-    padding: "15px 68px 30px",
+    padding: {
+      xs: "12px 24px 24px",
+      sm: "14px 48px 28px",
+      md: "15px 68px 30px",
+    },
     color: COLORS.text,
+    flexWrap: "wrap",
+    gap: "4px",
   },
   spinnerContainer: {
     width: "100%",
@@ -163,48 +176,53 @@ const styles = {
 }
 
 // Styled Components
-const DialogContainer = styled(Stack)({
+const DialogContainer = styled(Stack)(({ theme }) => ({
   background: "rgba(0, 0, 0, 0.758)",
-  width: "fit-content",
   margin: "auto",
-})
+  borderRadius: "4px",
+  width: "100%",
+  maxWidth: "100%",
+  [theme.breakpoints.up("sm")]: { width: "fit-content", minWidth: "380px" },
+}))
 
-const StyledInput = styled(TextField)({
-  width: "20rem",
+const StyledInput = styled(TextField)(({ theme }) => ({
   background: COLORS.text,
   borderRadius: "4px",
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-})
+  width: "100%",
+  "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+  [theme.breakpoints.up("sm")]: { width: "18rem" },
+  [theme.breakpoints.up("md")]: { width: "20rem" },
+}))
 
-const SubmitButton = styled(Button)({
+const SubmitButton = styled(Button)(({ theme }) => ({
   background: COLORS.primary,
   width: "100%",
-  height: "45px",
   fontWeight: 500,
   boxShadow: "none",
-  "&:hover": {
-    background: COLORS.primary,
-    boxShadow: "none",
-  },
+  height: "40px",
+  "&:hover": { background: COLORS.primary, boxShadow: "none" },
   "&:disabled": {
     background: "rgba(255, 255, 255, 0.5)",
     cursor: "not-allowed",
   },
-})
+  [theme.breakpoints.up("sm")]: { height: "42px" },
+  [theme.breakpoints.up("md")]: { height: "45px" },
+}))
 
-const ErrorMessage = styled(DialogContentText)({
-  marginTop: "20px",
+const ErrorMessage = styled(DialogContentText)(({ theme }) => ({
   color: COLORS.primary,
   fontWeight: 600,
-})
+  marginTop: "12px",
+  fontSize: "13px",
+  [theme.breakpoints.up("sm")]: { marginTop: "16px", fontSize: "14px" },
+  [theme.breakpoints.up("md")]: { marginTop: "20px" },
+}))
 
-const LinkText = styled(Typography)({
+const LinkText = styled(Typography)(({ theme }) => ({
   cursor: "pointer",
-  "&:hover": {
-    textDecoration: "underline",
-  },
-})
+  fontSize: "14px",
+  "&:hover": { textDecoration: "underline" },
+  [theme.breakpoints.up("sm")]: { fontSize: "16px" },
+}))
 
 export default DialogLogin

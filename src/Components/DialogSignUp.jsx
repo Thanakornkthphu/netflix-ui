@@ -101,7 +101,9 @@ const DialogSignUp = () => {
             />
           </DialogContentText>
 
-          <DialogContentText sx={{ marginTop: "20px" }}>
+          <DialogContentText
+            sx={{ marginTop: { xs: "12px", sm: "16px", md: "20px" } }}
+          >
             <StyledInput
               placeholder="Password"
               name="password"
@@ -125,68 +127,80 @@ const DialogSignUp = () => {
   )
 }
 
-// Styles
+// Responsive Styles
 const styles = {
   title: {
     color: COLORS.text,
-    padding: "30px 68px",
+    padding: { xs: "20px 24px", sm: "24px 48px", md: "30px 68px" },
     fontWeight: 800,
-    fontSize: "2rem",
+    fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2rem" },
   },
   content: {
-    padding: "0 68px",
+    padding: { xs: "0 24px", sm: "0 48px", md: "0 68px" },
   },
   actions: {
     justifyContent: "center",
-    padding: "30px 68px",
+    padding: { xs: "20px 24px", sm: "24px 48px", md: "30px 68px" },
   },
 }
 
 // Styled Components
-const GetStartedButton = styled(Button)({
+const GetStartedButton = styled(Button)(({ theme }) => ({
   marginTop: "20px",
   background: COLORS.primary,
-  width: "12rem",
-  height: "45px",
-  "&:hover": {
-    background: COLORS.primaryHover,
+  "&:hover": { background: COLORS.primaryHover },
+  width: "10rem",
+  height: "40px",
+  fontSize: "14px",
+  [theme.breakpoints.up("sm")]: { width: "11rem", height: "42px" },
+  [theme.breakpoints.up("md")]: {
+    width: "12rem",
+    height: "45px",
+    fontSize: "16px",
   },
-})
+}))
 
-const StyledDialog = styled(Dialog)({
-  "& .MuiBackdrop-root": {
-    backgroundColor: "rgba(0, 0, 0, 0.74)",
-  },
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiBackdrop-root": { backgroundColor: "rgba(0, 0, 0, 0.74)" },
   "& .MuiDialog-paper": {
     background: "rgba(84, 84, 84, 0.67)",
+    margin: "16px",
+    width: "calc(100% - 32px)",
+    [theme.breakpoints.up("sm")]: {
+      margin: "32px",
+      width: "auto",
+      minWidth: "380px",
+    },
   },
-})
+}))
 
-const StyledInput = styled(TextField)({
-  width: "25rem",
+const StyledInput = styled(TextField)(({ theme }) => ({
   background: COLORS.text,
   borderRadius: "4px",
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-})
+  width: "100%",
+  "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+  [theme.breakpoints.up("sm")]: { width: "20rem" },
+  [theme.breakpoints.up("md")]: { width: "25rem" },
+}))
 
-const SubmitButton = styled(Button)({
+const SubmitButton = styled(Button)(({ theme }) => ({
   background: COLORS.primary,
-  width: "12rem",
-  height: "45px",
   fontWeight: 500,
   boxShadow: "none",
-  "&:hover": {
-    background: COLORS.primaryHover,
-    boxShadow: "none",
-  },
-})
+  "&:hover": { background: COLORS.primaryHover, boxShadow: "none" },
+  width: "10rem",
+  height: "40px",
+  [theme.breakpoints.up("sm")]: { width: "11rem", height: "42px" },
+  [theme.breakpoints.up("md")]: { width: "12rem", height: "45px" },
+}))
 
-const ErrorMessage = styled(DialogContentText)({
-  marginTop: "20px",
+const ErrorMessage = styled(DialogContentText)(({ theme }) => ({
   color: COLORS.primary,
   fontWeight: 600,
-})
+  marginTop: "12px",
+  fontSize: "13px",
+  [theme.breakpoints.up("sm")]: { marginTop: "16px", fontSize: "14px" },
+  [theme.breakpoints.up("md")]: { marginTop: "20px" },
+}))
 
 export default DialogSignUp

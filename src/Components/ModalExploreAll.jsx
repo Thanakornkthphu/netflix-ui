@@ -54,8 +54,13 @@ const ModalExploreAll = ({ open, onClose, category }) => {
           {/* Header */}
           <ModalHeader>
             <Stack flexDirection="row" gap="15px" alignItems="flex-end">
-              <Typography variant="h4" fontWeight="bold" color={COLORS.text} lineHeight="33px">
-                {category.name} 
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+                color={COLORS.text}
+                lineHeight="33px"
+              >
+                {category.name}
               </Typography>
               <Typography color={COLORS.textSecondary} fontSize="14px">
                 {category.movies.length} titles found
@@ -96,7 +101,6 @@ const ModalExploreAll = ({ open, onClose, category }) => {
               ))}
             </Grid>
           </Box>
-
         </ModalContainer>
       </Fade>
     </Modal>

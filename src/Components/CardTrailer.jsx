@@ -8,6 +8,8 @@ import {
   getPosterUrl,
 } from "../Utils/constants"
 import { ReactComponent as NetflixLogo } from "../Assets/netflixIcon.svg"
+import { useNavigate } from "react-router-dom"
+import { pages } from "../Routers/path"
 
 const HOVER_DELAY = 700
 
@@ -27,7 +29,7 @@ const CardTrailer = ({
   const isMountedRef = useRef(true)
   const movieIdRef = useRef(movie.id)
   const cardRef = useRef(null)
-
+  const navigate = useNavigate()
   // Reset state when movie changes
   useEffect(() => {
     const previousMovieId = movieIdRef.current
@@ -132,6 +134,7 @@ const CardTrailer = ({
     >
       {/* Card Poster */}
       <Stack
+        onClick={() => navigate(pages.player.replace(":id", movie.id))}
         sx={{
           position: "relative",
           zIndex: isHovered ? -1 : 1,

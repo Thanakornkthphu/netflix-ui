@@ -26,7 +26,7 @@ const Login = () => {
         backgroundImage: `linear-gradient(#00000069, #00000069), url(${backgroundImg})`,
       }}
     >
-      <Stack sx={{ padding: "30px 60px" }}>
+      <Stack sx={{ padding: { xs: "16px", sm: "24px 40px", md: "30px 60px" } }}>
         <Header />
         <DialogLogin />
       </Stack>

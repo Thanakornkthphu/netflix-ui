@@ -6,6 +6,8 @@ import {
   Stack,
   Typography,
   styled,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material"
 import { ArrowDropDown } from "@mui/icons-material"
 import { FaPlay } from "react-icons/fa"
@@ -26,6 +28,10 @@ const MiniPlayer = ({
   const [isAnimated, setIsAnimated] = useState(false)
   const [showMoreInfo, setShowMoreInfo] = useState(false)
 
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+  const playerWidth = isMobile ? 270 : MINI_PLAYER_WIDTH
+
   const genres = getGenresFromIds(movie.genre_ids)
   const navigate = useNavigate()
 
@@ -45,7 +51,7 @@ const MiniPlayer = ({
       case "right":
         return { right: `${positionOffset}px`, left: "auto" }
       default:
-        return { left: "50%", marginLeft: `-${MINI_PLAYER_WIDTH / 2}px` }
+        return { left: "50%", marginLeft: `-${playerWidth / 2}px` }
     }
   }
 
@@ -62,9 +68,9 @@ const MiniPlayer = ({
       sx={{
         position: "absolute",
         ...getPosition(),
-        top: "-50px",
-        width: `${MINI_PLAYER_WIDTH}px`,
-        minHeight: "370px",
+        top: isMobile ? "-30px" : "-50px",
+        width: `${playerWidth}px`,
+        minHeight: isMobile ? "280px" : "370px",
         height: "auto",
         borderRadius: "8px",
         overflow: "hidden",
@@ -86,7 +92,7 @@ const MiniPlayer = ({
       onMouseLeave={() => onHoverChange(false)}
     >
       {/* Video Preview */}
-      <CardContent sx={{ padding: 0, height: "300px" }}>
+      <CardContent sx={{ padding: 0, height: isMobile ? "200px" : "300px" }}>
         <VideoFrame
           src="https://www.youtube.com/embed/UdF25ZqWV7g?autoplay=1&mute=0&loop=1&controls=1&playlist=UdF25ZqWV7g"
           allow="autoplay; fullscreen"

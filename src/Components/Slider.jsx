@@ -16,9 +16,11 @@ import "swiper/css/navigation"
 const MIN_MOVIES_FOR_EXPLORE = 7
 
 const SWIPER_BREAKPOINTS = {
-  0: { slidesPerView: 2 },
-  600: { slidesPerView: 4 },
-  1200: { slidesPerView: 7 },
+  0: { slidesPerView: 2, slidesPerGroup: 2, spaceBetween: 8 },
+  480: { slidesPerView: 3, slidesPerGroup: 3, spaceBetween: 10 },
+  600: { slidesPerView: 4, slidesPerGroup: 4, spaceBetween: 12 },
+  900: { slidesPerView: 5, slidesPerGroup: 5, spaceBetween: 15 },
+  1200: { slidesPerView: 7, slidesPerGroup: 7, spaceBetween: 18 },
 }
 
 const Slider = ({ movies, isLoading }) => {
@@ -74,10 +76,14 @@ const Slider = ({ movies, isLoading }) => {
         const isRowHovered = rowIndex === hoveredRowIndex
         const hasExploreAll = category.movies.length > MIN_MOVIES_FOR_EXPLORE
 
-        const { isAtBeginning = true, isAtEnd = false } = sliderStates[rowIndex] || {}
+        const { isAtBeginning = true, isAtEnd = false } =
+          sliderStates[rowIndex] || {}
 
         return (
-          <Stack key={rowIndex} sx={{ padding: "0 20px" }}>
+          <Stack
+            key={rowIndex}
+            sx={{ padding: { xs: "0 12px", sm: "0 16px", md: "30px 50px" } }}
+          >
             {/* Category Header */}
             <CategoryHeader
               direction="row"
@@ -207,7 +213,14 @@ const Slider = ({ movies, isLoading }) => {
 
 // Styled Components
 const CategoryHeader = ({ children, ...props }) => (
-  <Stack mt="40px" mb="5px" sx={{ width: "fit-content" }} {...props}>
+  <Stack
+    sx={{
+      mt: { xs: "24px", sm: "32px", md: "40px" },
+      mb: "5px",
+      width: "fit-content",
+    }}
+    {...props}
+  >
     {children}
   </Stack>
 )
@@ -216,10 +229,10 @@ const CategoryTitle = ({ children, $hasExploreAll }) => (
   <Typography
     sx={{
       color: COLORS.text,
-      fontSize: "32px",
+      fontSize: { xs: "18px", sm: "24px", md: "32px" },
       fontWeight: "bold",
       transition: "color 0.2s ease",
-      lineHeight: "37px",
+      lineHeight: { xs: "32px", sm: "35px", md: "40px" },
       "&:hover": $hasExploreAll ? { color: "#e5e5e5" } : {},
     }}
   >

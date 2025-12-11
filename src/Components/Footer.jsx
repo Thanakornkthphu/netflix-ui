@@ -57,7 +57,7 @@ const Footer = () => {
         </Stack>
 
         {/* Footer Links */}
-        <Stack direction="row" gap="125px">
+        <FooterLinksGrid>
           {FOOTER_LINKS.map((column, colIndex) => (
             <Stack key={colIndex} gap={SPACING.sm}>
               {column.map((item, linkIndex) => (
@@ -73,41 +73,56 @@ const Footer = () => {
               ))}
             </Stack>
           ))}
-        </Stack>
+        </FooterLinksGrid>
       </FooterContent>
     </FooterContainer>
   )
 }
 
 // Styled Components
-const FooterContainer = styled(Box)({
+const FooterContainer = styled(Box)(({ theme }) => ({
   width: "100%",
   display: "flex",
   justifyContent: "center",
   backgroundColor: COLORS.background,
-  padding: `70px ${SPACING.xxl} 40px`,
   color: COLORS.textMuted,
-})
+  padding: "40px 16px 30px",
+  [theme.breakpoints.up("sm")]: { padding: "50px 40px 35px" },
+  [theme.breakpoints.up("md")]: { padding: `70px ${SPACING.xxl} 40px` },
+}))
 
 const FooterContent = styled(Stack)({
-  width: "fit-content",
+  width: "100%",
+  maxWidth: "1200px",
   flexDirection: "column",
 })
+
+const FooterLinksGrid = styled(Box)(({ theme }) => ({
+  display: "grid",
+  gridTemplateColumns: "repeat(2, 1fr)",
+  gap: "24px 16px",
+  [theme.breakpoints.up("sm")]: {
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "24px 40px",
+  },
+  [theme.breakpoints.up("md")]: {
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gap: "24px 80px",
+  },
+}))
 
 const SocialLink = styled(Link)({
   color: COLORS.text,
   transition: "color 0.2s",
-  "&:hover": {
-    color: COLORS.textMuted,
-  },
+  "&:hover": { color: COLORS.textMuted },
 })
 
-const FooterLink = styled(Link)({
+const FooterLink = styled(Link)(({ theme }) => ({
   color: COLORS.textMuted,
-  fontSize: "13px",
-  "&:hover": {
-    color: "#b3b3b3",
-  },
-})
+  "&:hover": { color: "#b3b3b3" },
+  fontSize: "11px",
+  [theme.breakpoints.up("sm")]: { fontSize: "12px" },
+  [theme.breakpoints.up("md")]: { fontSize: "13px" },
+}))
 
 export default Footer
